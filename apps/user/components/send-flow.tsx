@@ -7,6 +7,16 @@ import Link from "next/link";
 
 type Step = "search" | "amount" | "confirm" | "done";
 
+function buildRecipientField(
+  recipient: Record<string, string> | null,
+  preset?: Record<string, string>,
+): Record<string, string> {
+  if (recipient?.username) return { toUsername: recipient.username };
+  if (recipient?.accountNumber) return { toAccountNumber: recipient.accountNumber };
+  if (preset?.paymentLinkToken) return { paymentLinkToken: preset.paymentLinkToken };
+  return {};
+}
+
 export function SendFlow({ preset }: { preset?: Record<string, string> } = {}) {
   const [step, setStep] = useState<Step>(preset ? "amount" : "search");
   const [query, setQuery] = useState("");
@@ -17,14 +27,6 @@ export function SendFlow({ preset }: { preset?: Record<string, string> } = {}) {
   const [receipt, setReceipt] = useState<Record<string, unknown> | null>(null);
   const [pending, start] = useTransition();
   const { push } = useToast();
-
-  const recipientField = recipient?.username
-    ? { toUsername: recipient.username }
-    : recipient?.accountNumber
-      ? { toAccountNumber: recipient.accountNumber }
-      : preset?.paymentLinkToken
-        ? { paymentLinkToken: preset.paymentLinkToken }
-        : {};
 
   return (
     <div className="space-y-4">
@@ -76,7 +78,10 @@ export function SendFlow({ preset }: { preset?: Record<string, string> } = {}) {
               loading={pending}
               onClick={() =>
                 start(async () => {
-                  const body = { ...recipientField, amountPaisa: parseTakaInput(amount) };
+                  const body: Record<string, string> = {
+                    ...buildRecipientField(recipient, preset),
+                    amountPaisa: parseTakaInput(amount),
+                  };
                   const res = await quoteTransferAction(body);
                   if (!res.ok) return push(res.error, "error");
                   setQuote(res.data.quote as Record<string, string>);
@@ -103,7 +108,11 @@ export function SendFlow({ preset }: { preset?: Record<string, string> } = {}) {
               loading={pending}
               onClick={() =>
                 start(async () => {
-                  const body = { ...recipientField, amountPaisa: parseTakaInput(amount), description: "Relay transfer" };
+                  const body: Record<string, string> = {
+                    ...buildRecipientField(recipient, preset),
+                    amountPaisa: parseTakaInput(amount),
+                    description: "Relay transfer",
+                  };
                   const res = await confirmTransferAction(body);
                   if (!res.ok) return push(res.error, "error");
                   setReceipt(res.data as Record<string, unknown>);

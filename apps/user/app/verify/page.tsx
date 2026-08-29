@@ -51,8 +51,10 @@ export default function VerifyPage() {
             onClick={() =>
               start(async () => {
                 const res = await resendOtpAction();
-                if (res.ok) push(`OTP sent via ${res.data.channel}. Check Notifications.`);
-                else push(res.error, "error");
+                if (res.ok) {
+                  const data = res.data as { channel: string };
+                  push(`OTP sent via ${data.channel}. Check Notifications.`);
+                } else push(res.error, "error");
               })
             }
           >

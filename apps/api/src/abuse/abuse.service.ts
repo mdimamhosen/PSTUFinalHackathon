@@ -29,7 +29,7 @@ export class AbuseService {
   }
 
   private async runClaudeOrRules(signals: Record<string, unknown>): Promise<AbuseResult> {
-    const key = process.env.ANTHROPIC_API_KEY?.trim();
+    const key = (process.env.ANTHROPIC_API_KEY || process.env.CLAUDE_API_KEY)?.trim();
     if (key) {
       try {
         const Anthropic = (await import("@anthropic-ai/sdk")).default;

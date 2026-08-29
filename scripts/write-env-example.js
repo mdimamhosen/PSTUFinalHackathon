@@ -1,4 +1,5 @@
-DATABASE_URL=postgresql://relay:relay@localhost:5432/relay
+const fs = require("fs");
+const content = `DATABASE_URL=postgresql://relay:relay@localhost:5432/relay
 REDIS_URL=redis://localhost:6379
 JWT_SECRET=
 JWT_EXPIRES_IN=7d
@@ -25,3 +26,6 @@ TWILIO_VERIFY_SERVICE_SID=
 ANTHROPIC_API_KEY=
 CLAUDE_API_KEY=
 OPENAI_API_KEY=
+`;
+fs.writeFileSync(".env.example", content, { encoding: "utf8" });
+console.log("wrote .env.example", fs.readFileSync(".env.example")[1]);
