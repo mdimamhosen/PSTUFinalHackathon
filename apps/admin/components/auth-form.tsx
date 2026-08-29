@@ -1,13 +1,26 @@
 "use client";
 import { useTransition } from "react";
-import { Button, Input, Card, CardContent, CardHeader, CardTitle } from "@relay/ui";
+import {
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  Field,
+  Input,
+} from "@relay/ui";
 import { useToast } from "@relay/ui";
 
 export function AuthForm({
+  title,
+  description,
   action,
   fields,
   submitLabel,
 }: {
+  title: string;
+  description?: string;
   action: (fd: FormData) => Promise<{ ok?: boolean; error?: string } | void>;
   fields: Array<{ name: string; label: string; type?: string; placeholder?: string }>;
   submitLabel: string;
@@ -15,13 +28,14 @@ export function AuthForm({
   const [pending, start] = useTransition();
   const { push } = useToast();
   return (
-    <Card>
+    <Card className="animate-in shadow-sm">
       <CardHeader>
-        <CardTitle>{submitLabel}</CardTitle>
+        <CardTitle className="text-lg">{title}</CardTitle>
+        {description ? <CardDescription>{description}</CardDescription> : null}
       </CardHeader>
       <CardContent>
         <form
-          className="space-y-3"
+          className="space-y-4"
           action={(fd) =>
             start(async () => {
               const res = await action(fd);
@@ -30,12 +44,17 @@ export function AuthForm({
           }
         >
           {fields.map((f) => (
-            <div key={f.name} className="space-y-1">
-              <label className="text-sm font-medium">{f.label}</label>
-              <Input name={f.name} type={f.type ?? "text"} placeholder={f.placeholder} required />
-            </div>
+            <Field key={f.name} label={f.label} htmlFor={f.name}>
+              <Input
+                id={f.name}
+                name={f.name}
+                type={f.type ?? "text"}
+                placeholder={f.placeholder}
+                required
+              />
+            </Field>
           ))}
-          <Button type="submit" className="w-full" loading={pending}>
+          <Button type="submit" className="w-full" size="lg" loading={pending}>
             {submitLabel}
           </Button>
         </form>

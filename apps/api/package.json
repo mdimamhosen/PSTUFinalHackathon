@@ -9,10 +9,10 @@
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\"",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
-    "prisma:seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
+    "prisma:seed": "node prisma/run-seed.cjs"
   },
   "prisma": {
-    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
+    "seed": "node prisma/run-seed.cjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",

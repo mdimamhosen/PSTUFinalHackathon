@@ -3,36 +3,104 @@
 @tailwind utilities;
 
 :root {
-  --background: 220 20% 97%;
-  --foreground: 222 47% 11%;
+  --background: 160 30% 97%;
+  --foreground: 168 40% 10%;
   --card: 0 0% 100%;
-  --card-foreground: 222 47% 11%;
-  --primary: 221 83% 53%;
-  --primary-foreground: 210 40% 98%;
-  --secondary: 210 40% 96%;
-  --secondary-foreground: 222 47% 11%;
-  --muted: 210 40% 96%;
-  --muted-foreground: 215 16% 47%;
-  --accent: 142 76% 36%;
-  --accent-foreground: 0 0% 100%;
-  --destructive: 0 84% 60%;
+  --card-foreground: 168 40% 10%;
+  --primary: 173 72% 28%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 165 25% 93%;
+  --secondary-foreground: 168 35% 18%;
+  --muted: 160 18% 94%;
+  --muted-foreground: 168 10% 42%;
+  --accent: 168 55% 92%;
+  --accent-foreground: 173 72% 22%;
+  --success: 152 60% 36%;
+  --success-foreground: 0 0% 100%;
+  --warning: 38 92% 45%;
+  --warning-foreground: 0 0% 100%;
+  --destructive: 0 72% 48%;
   --destructive-foreground: 0 0% 100%;
-  --border: 214 32% 91%;
-  --input: 214 32% 91%;
-  --ring: 221 83% 53%;
-  --radius: 0.75rem;
+  --border: 165 18% 88%;
+  --input: 165 18% 88%;
+  --ring: 173 72% 28%;
+  --radius: 0.875rem;
+  --surface-glow: 165 45% 92%;
 }
 
-* {
-  border-color: hsl(var(--border));
+.theme-admin {
+  --background: 210 20% 97%;
+  --foreground: 215 28% 14%;
+  --primary: 215 28% 17%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 210 16% 93%;
+  --secondary-foreground: 215 28% 17%;
+  --muted: 210 16% 94%;
+  --muted-foreground: 215 12% 42%;
+  --accent: 210 25% 92%;
+  --accent-foreground: 215 28% 17%;
+  --border: 214 18% 88%;
+  --input: 214 18% 88%;
+  --ring: 215 28% 17%;
 }
-body {
-  background: hsl(var(--background));
-  color: hsl(var(--foreground));
-  font-family:
-    system-ui,
-    -apple-system,
-    Segoe UI,
-    Roboto,
-    sans-serif;
+
+@layer base {
+  * {
+    @apply border-[hsl(var(--border))];
+  }
+  html {
+    @apply antialiased;
+  }
+  body {
+    @apply bg-[hsl(var(--background))] text-[hsl(var(--foreground))];
+    background-image:
+      radial-gradient(ellipse 80% 50% at 50% -20%, hsl(var(--surface-glow)), transparent),
+      linear-gradient(180deg, hsl(160 30% 98%), hsl(var(--background)));
+    background-attachment: fixed;
+    font-feature-settings: "ss01" on, "cv11" on;
+  }
+  :focus-visible {
+    @apply outline-none ring-2 ring-[hsl(var(--ring))] ring-offset-2 ring-offset-[hsl(var(--background))];
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+  .animate-in {
+    animation: fade-up 0.35s ease-out both;
+  }
+  .animate-fade {
+    animation: fade 0.25s ease-out both;
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }

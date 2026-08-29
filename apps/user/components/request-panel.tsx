@@ -10,6 +10,8 @@ import {
   formatPaisa,
   parseTakaInput,
   Badge,
+  PageHeader,
+  EmptyState,
 } from "@relay/ui";
 import { useToast } from "@relay/ui";
 import {
@@ -42,7 +44,8 @@ export function RequestPanel() {
   }, []);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 animate-in">
+      <PageHeader title="Requests" description="Ask for money or pay pending requests" />
       <Card>
         <CardHeader>
           <CardTitle>Request money</CardTitle>
@@ -157,7 +160,9 @@ export function RequestPanel() {
               </div>
             );
           })}
-          {!items.length && <p className="text-slate-500">No requests yet.</p>}
+          {!items.length ? (
+        <EmptyState title="No requests" description="Create a request or wait for someone to ask you." />
+      ) : null}
         </CardContent>
       </Card>
     </div>
