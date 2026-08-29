@@ -1,6 +1,15 @@
-'use client';
+"use client";
 import { useState, useTransition } from "react";
-import { Button, Input, Card, CardContent, CardHeader, CardTitle, formatPaisa, parseTakaInput } from "@relay/ui";
+import {
+  Button,
+  Input,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  formatPaisa,
+  parseTakaInput,
+} from "@relay/ui";
 import { useToast } from "@relay/ui";
 import { searchUsersAction, quoteTransferAction, confirmTransferAction } from "@/lib/actions";
 import Link from "next/link";
@@ -21,8 +30,12 @@ export function SendFlow({ preset }: { preset?: Record<string, string> } = {}) {
   const [step, setStep] = useState<Step>(preset ? "amount" : "search");
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Array<Record<string, string>>>([]);
-  const [recipient, setRecipient] = useState<Record<string, string> | null>(preset ? { username: preset.toUsername ?? "", ...preset } : null);
-  const [amount, setAmount] = useState(preset?.amountPaisa ? String(Number(preset.amountPaisa) / 100) : "");
+  const [recipient, setRecipient] = useState<Record<string, string> | null>(
+    preset ? { username: preset.toUsername ?? "", ...preset } : null,
+  );
+  const [amount, setAmount] = useState(
+    preset?.amountPaisa ? String(Number(preset.amountPaisa) / 100) : "",
+  );
   const [quote, setQuote] = useState<Record<string, string> | null>(null);
   const [receipt, setReceipt] = useState<Record<string, unknown> | null>(null);
   const [pending, start] = useTransition();
@@ -32,9 +45,15 @@ export function SendFlow({ preset }: { preset?: Record<string, string> } = {}) {
     <div className="space-y-4">
       {step === "search" && (
         <Card>
-          <CardHeader><CardTitle>Find recipient</CardTitle></CardHeader>
+          <CardHeader>
+            <CardTitle>Find recipient</CardTitle>
+          </CardHeader>
           <CardContent className="space-y-3">
-            <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Username, email, or phone" />
+            <Input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Username, email, or phone"
+            />
             <Button
               className="w-full"
               loading={pending}
@@ -70,9 +89,16 @@ export function SendFlow({ preset }: { preset?: Record<string, string> } = {}) {
 
       {step === "amount" && recipient && (
         <Card>
-          <CardHeader><CardTitle>Send to @{recipient.username || recipient.accountNumber}</CardTitle></CardHeader>
+          <CardHeader>
+            <CardTitle>Send to @{recipient.username || recipient.accountNumber}</CardTitle>
+          </CardHeader>
           <CardContent className="space-y-3">
-            <Input value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="Amount in ৳" inputMode="decimal" />
+            <Input
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              placeholder="Amount in ৳"
+              inputMode="decimal"
+            />
             <Button
               className="w-full"
               loading={pending}
@@ -98,11 +124,22 @@ export function SendFlow({ preset }: { preset?: Record<string, string> } = {}) {
 
       {step === "confirm" && quote && (
         <Card>
-          <CardHeader><CardTitle>Confirm payment</CardTitle></CardHeader>
+          <CardHeader>
+            <CardTitle>Confirm payment</CardTitle>
+          </CardHeader>
           <CardContent className="space-y-3 text-sm">
-            <div className="flex justify-between"><span>You send</span><strong>{quote.youSend}</strong></div>
-            <div className="flex justify-between"><span>They receive</span><strong>{quote.theyReceive}</strong></div>
-            <div className="flex justify-between"><span>Fee</span><span>{quote.fee}</span></div>
+            <div className="flex justify-between">
+              <span>You send</span>
+              <strong>{quote.youSend}</strong>
+            </div>
+            <div className="flex justify-between">
+              <span>They receive</span>
+              <strong>{quote.theyReceive}</strong>
+            </div>
+            <div className="flex justify-between">
+              <span>Fee</span>
+              <span>{quote.fee}</span>
+            </div>
             <Button
               className="w-full"
               loading={pending}
@@ -129,12 +166,25 @@ export function SendFlow({ preset }: { preset?: Record<string, string> } = {}) {
 
       {step === "done" && receipt && (
         <Card>
-          <CardHeader><CardTitle>Receipt</CardTitle></CardHeader>
+          <CardHeader>
+            <CardTitle>Receipt</CardTitle>
+          </CardHeader>
           <CardContent className="space-y-2 text-sm">
-            <p>Reference: <strong>{String(receipt.reference)}</strong></p>
+            <p>
+              Reference: <strong>{String(receipt.reference)}</strong>
+            </p>
             <p>Amount: {formatPaisa(String(receipt.amountPaisa))}</p>
-            <Link href={`/send/receipt/${receipt.id}`} className="text-blue-600">View details</Link>
-            <Button className="w-full mt-3" onClick={() => { setStep("search"); setReceipt(null); setQuote(null); }}>
+            <Link href={`/send/receipt/${receipt.id}`} className="text-blue-600">
+              View details
+            </Link>
+            <Button
+              className="w-full mt-3"
+              onClick={() => {
+                setStep("search");
+                setReceipt(null);
+                setQuote(null);
+              }}
+            >
               Send again
             </Button>
           </CardContent>

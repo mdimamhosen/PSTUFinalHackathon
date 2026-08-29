@@ -1,6 +1,14 @@
-'use client';
+"use client";
 import { useEffect, useState, useTransition } from "react";
-import { Button, Input, Card, CardContent, CardHeader, CardTitle, CardDescription } from "@relay/ui";
+import {
+  Button,
+  Input,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@relay/ui";
 import { useToast } from "@relay/ui";
 import { getMeAction, verifyEmailAction, verifyPhoneAction, resendOtpAction } from "@/lib/actions";
 

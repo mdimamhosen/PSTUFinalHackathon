@@ -1,8 +1,22 @@
-'use client';
+"use client";
 import { useEffect, useState, useTransition } from "react";
-import { Button, Input, Card, CardContent, CardHeader, CardTitle, formatPaisa, parseTakaInput } from "@relay/ui";
+import {
+  Button,
+  Input,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  formatPaisa,
+  parseTakaInput,
+} from "@relay/ui";
 import { useToast } from "@relay/ui";
-import { getMeAction, createPaymentLinkAction, listPaymentLinksAction, revokePaymentLinkAction } from "@/lib/actions";
+import {
+  getMeAction,
+  createPaymentLinkAction,
+  listPaymentLinksAction,
+  revokePaymentLinkAction,
+} from "@/lib/actions";
 import QRCode from "qrcode";
 
 export function ReceivePanel() {
@@ -33,7 +47,9 @@ export function ReceivePanel() {
   return (
     <div className="space-y-4">
       <Card>
-        <CardHeader><CardTitle>Your account QR</CardTitle></CardHeader>
+        <CardHeader>
+          <CardTitle>Your account QR</CardTitle>
+        </CardHeader>
         <CardContent className="flex flex-col items-center gap-2">
           {qr ? <img src={qr} alt="Account QR" className="rounded-lg border" /> : null}
           <p className="font-mono text-sm">{account}</p>
@@ -42,9 +58,15 @@ export function ReceivePanel() {
       </Card>
 
       <Card>
-        <CardHeader><CardTitle>Create payment link</CardTitle></CardHeader>
+        <CardHeader>
+          <CardTitle>Create payment link</CardTitle>
+        </CardHeader>
         <CardContent className="space-y-3">
-          <Input value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="Fixed amount (optional)" />
+          <Input
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            placeholder="Fixed amount (optional)"
+          />
           <Input value={note} onChange={(e) => setNote(e.target.value)} placeholder="Note" />
           <Button
             className="w-full"
@@ -56,7 +78,8 @@ export function ReceivePanel() {
                 const res = await createPaymentLinkAction(body);
                 if (!res.ok) return push(res.error, "error");
                 push("Link created");
-                setAmount(""); setNote("");
+                setAmount("");
+                setNote("");
                 loadLinks();
               })
             }
@@ -67,16 +90,39 @@ export function ReceivePanel() {
       </Card>
 
       <Card>
-        <CardHeader><CardTitle>Your links</CardTitle></CardHeader>
+        <CardHeader>
+          <CardTitle>Your links</CardTitle>
+        </CardHeader>
         <CardContent className="space-y-2">
           {links.map((l) => (
             <div key={String(l.publicToken)} className="rounded-lg border p-3 text-sm">
-              <div className="font-medium">{l.amountPaisa ? formatPaisa(String(l.amountPaisa)) : "Any amount"}</div>
-              <a href={String(l.url)} className="break-all text-blue-600">{String(l.url)}</a>
+              <div className="font-medium">
+                {l.amountPaisa ? formatPaisa(String(l.amountPaisa)) : "Any amount"}
+              </div>
+              <a href={String(l.url)} className="break-all text-blue-600">
+                {String(l.url)}
+              </a>
               <div className="mt-2 flex gap-2">
-                <Button size="sm" variant="outline" onClick={() => navigator.clipboard.writeText(String(l.url))}>Copy</Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => navigator.clipboard.writeText(String(l.url))}
+                >
+                  Copy
+                </Button>
                 {String(l.status) === "ACTIVE" && (
-                  <Button size="sm" variant="destructive" onClick={() => start(async () => { await revokePaymentLinkAction(String(l.publicToken)); loadLinks(); })}>Revoke</Button>
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    onClick={() =>
+                      start(async () => {
+                        await revokePaymentLinkAction(String(l.publicToken));
+                        loadLinks();
+                      })
+                    }
+                  >
+                    Revoke
+                  </Button>
                 )}
               </div>
             </div>

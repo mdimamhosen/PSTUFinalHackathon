@@ -26,7 +26,11 @@ export default async function DashboardPage() {
           { href: "/receive", label: "Receive", icon: "📥" },
           { href: "/split", label: "Split", icon: "➗" },
         ].map((a) => (
-          <Link key={a.href} href={a.href} className="rounded-xl border bg-white p-4 text-center shadow-sm hover:bg-slate-50">
+          <Link
+            key={a.href}
+            href={a.href}
+            className="rounded-xl border bg-white p-4 text-center shadow-sm hover:bg-slate-50"
+          >
             <div className="text-2xl">{a.icon}</div>
             <div className="font-medium">{a.label}</div>
           </Link>
@@ -34,17 +38,33 @@ export default async function DashboardPage() {
       </div>
 
       <Card>
-        <CardHeader><CardTitle className="text-base">Account</CardTitle></CardHeader>
+        <CardHeader>
+          <CardTitle className="text-base">Account</CardTitle>
+        </CardHeader>
         <CardContent className="space-y-2 text-sm">
-          <div className="flex justify-between"><span className="text-slate-500">Status</span><Badge variant={user.status === "ACTIVE" ? "success" : "warning"}>{String(user.status)}</Badge></div>
-          <div className="flex justify-between"><span className="text-slate-500">Account</span><span className="font-mono">{String(user.accountNumber)}</span></div>
+          <div className="flex justify-between">
+            <span className="text-slate-500">Status</span>
+            <Badge variant={user.status === "ACTIVE" ? "success" : "warning"}>
+              {String(user.status)}
+            </Badge>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-slate-500">Account</span>
+            <span className="font-mono">{String(user.accountNumber)}</span>
+          </div>
         </CardContent>
       </Card>
 
       <div className="grid grid-cols-3 gap-2 text-center text-sm">
-        <Link href="/contacts" className="rounded-lg border p-3 hover:bg-slate-50">Contacts</Link>
-        <Link href="/rewards" className="rounded-lg border p-3 hover:bg-slate-50">Rewards</Link>
-        <Link href="/notifications" className="rounded-lg border p-3 hover:bg-slate-50">Alerts</Link>
+        <Link href="/contacts" className="rounded-lg border p-3 hover:bg-slate-50">
+          Contacts
+        </Link>
+        <Link href="/rewards" className="rounded-lg border p-3 hover:bg-slate-50">
+          Rewards
+        </Link>
+        <Link href="/notifications" className="rounded-lg border p-3 hover:bg-slate-50">
+          Alerts
+        </Link>
       </div>
     </div>
   );

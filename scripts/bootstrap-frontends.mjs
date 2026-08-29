@@ -11,25 +11,33 @@ function write(rel, content) {
 
 const files = {};
 
-files["packages/ui/package.json"] = JSON.stringify({
-  name: "@relay/ui",
-  version: "0.0.0",
-  private: true,
-  main: "./src/index.ts",
-  types: "./src/index.ts",
-  exports: {
-    ".": "./src/index.ts",
-    "./globals.css": "./src/globals.css",
+files["packages/ui/package.json"] = JSON.stringify(
+  {
+    name: "@relay/ui",
+    version: "0.0.0",
+    private: true,
+    main: "./src/index.ts",
+    types: "./src/index.ts",
+    exports: {
+      ".": "./src/index.ts",
+      "./globals.css": "./src/globals.css",
+    },
+    peerDependencies: { react: "^19", "react-dom": "^19" },
+    devDependencies: { "@types/react": "^19", typescript: "^5.7.3" },
   },
-  peerDependencies: { react: "^19", "react-dom": "^19" },
-  devDependencies: { "@types/react": "^19", typescript: "^5.7.3" },
-}, null, 2);
+  null,
+  2,
+);
 
-files["packages/ui/tsconfig.json"] = JSON.stringify({
-  extends: "@relay/typescript-config/base.json",
-  compilerOptions: { jsx: "react-jsx", outDir: "dist" },
-  include: ["src"],
-}, null, 2);
+files["packages/ui/tsconfig.json"] = JSON.stringify(
+  {
+    extends: "@relay/typescript-config/base.json",
+    compilerOptions: { jsx: "react-jsx", outDir: "dist" },
+    include: ["src"],
+  },
+  null,
+  2,
+);
 
 files["packages/ui/src/globals.css"] = `@tailwind base;
 @tailwind components;
@@ -72,7 +80,8 @@ export function cn(...inputs: ClassValue[]) {
 }
 `;
 
-files["packages/ui/src/lib/money.ts"] = `export function formatPaisa(paisa: string | number): string {
+files["packages/ui/src/lib/money.ts"] =
+  `export function formatPaisa(paisa: string | number): string {
   const n = typeof paisa === "string" ? Number(paisa) : paisa;
   if (!Number.isFinite(n)) return "৳0.00";
   const taka = n / 100;
@@ -400,15 +409,19 @@ files["apps/user/package.json"] = JSON.stringify(userApp.pkg, null, 2);
 files["apps/admin/package.json"] = JSON.stringify(adminApp.pkg, null, 2);
 
 for (const app of ["user", "admin"]) {
-  files[`apps/${app}/tsconfig.json`] = JSON.stringify({
-    extends: "@relay/typescript-config/nextjs.json",
-    compilerOptions: {
-      paths: { "@/*": ["./*"], "@relay/ui": ["../../packages/ui/src/index.ts"] },
-      plugins: [{ name: "next" }],
+  files[`apps/${app}/tsconfig.json`] = JSON.stringify(
+    {
+      extends: "@relay/typescript-config/nextjs.json",
+      compilerOptions: {
+        paths: { "@/*": ["./*"], "@relay/ui": ["../../packages/ui/src/index.ts"] },
+        plugins: [{ name: "next" }],
+      },
+      include: ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+      exclude: ["node_modules"],
     },
-    include: ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-    exclude: ["node_modules"],
-  }, null, 2);
+    null,
+    2,
+  );
 
   files[`apps/${app}/next.config.ts`] = `import type { NextConfig } from "next";
 
@@ -419,7 +432,8 @@ const nextConfig: NextConfig = {
 export default nextConfig;
 `;
 
-  files[`apps/${app}/postcss.config.mjs`] = `export default { plugins: { tailwindcss: {}, autoprefixer: {} } };
+  files[`apps/${app}/postcss.config.mjs`] =
+    `export default { plugins: { tailwindcss: {}, autoprefixer: {} } };
 `;
 
   files[`apps/${app}/tailwind.config.ts`] = `import type { Config } from "tailwindcss";

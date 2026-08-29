@@ -18,7 +18,10 @@ export default function LoginPage() {
         ]}
         footer={
           <p className="mt-4 text-center text-sm text-slate-500">
-            New here? <Link href="/register" className="text-blue-600">Create account</Link>
+            New here?{" "}
+            <Link href="/register" className="text-blue-600">
+              Create account
+            </Link>
           </p>
         }
       />

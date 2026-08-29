@@ -1,6 +1,16 @@
-'use client';
+"use client";
 import { useEffect, useState, useTransition } from "react";
-import { Button, Input, Card, CardContent, CardHeader, CardTitle, formatPaisa, parseTakaInput, Badge } from "@relay/ui";
+import {
+  Button,
+  Input,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  formatPaisa,
+  parseTakaInput,
+  Badge,
+} from "@relay/ui";
 import { useToast } from "@relay/ui";
 import {
   createMoneyRequestAction,
@@ -34,20 +44,40 @@ export function RequestPanel() {
   return (
     <div className="space-y-4">
       <Card>
-        <CardHeader><CardTitle>Request money</CardTitle></CardHeader>
+        <CardHeader>
+          <CardTitle>Request money</CardTitle>
+        </CardHeader>
         <CardContent className="space-y-3">
-          <Input value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Payer username" />
-          <Input value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="Amount ৳" />
-          <Input value={note} onChange={(e) => setNote(e.target.value)} placeholder="Note (optional)" />
+          <Input
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            placeholder="Payer username"
+          />
+          <Input
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            placeholder="Amount ৳"
+          />
+          <Input
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            placeholder="Note (optional)"
+          />
           <Button
             className="w-full"
             loading={pending}
             onClick={() =>
               start(async () => {
-                const res = await createMoneyRequestAction({ toUsername: username.replace(/^@/, ""), amountPaisa: parseTakaInput(amount), note: note || undefined });
+                const res = await createMoneyRequestAction({
+                  toUsername: username.replace(/^@/, ""),
+                  amountPaisa: parseTakaInput(amount),
+                  note: note || undefined,
+                });
                 if (!res.ok) return push(res.error, "error");
                 push("Request sent");
-                setUsername(""); setAmount(""); setNote("");
+                setUsername("");
+                setAmount("");
+                setNote("");
                 load();
               })
             }
@@ -58,7 +88,9 @@ export function RequestPanel() {
       </Card>
 
       <Card>
-        <CardHeader><CardTitle>Inbox</CardTitle></CardHeader>
+        <CardHeader>
+          <CardTitle>Inbox</CardTitle>
+        </CardHeader>
         <CardContent className="space-y-3">
           {items.map((item) => {
             const requester = item.requester as Record<string, string> | undefined;
@@ -69,19 +101,56 @@ export function RequestPanel() {
               <div key={String(item.id)} className="rounded-lg border p-3 text-sm">
                 <div className="flex justify-between">
                   <strong>{formatPaisa(String(item.amountPaisa))}</strong>
-                  <Badge variant={String(item.status) === "PENDING" ? "warning" : "secondary"}>{String(item.status)}</Badge>
+                  <Badge variant={String(item.status) === "PENDING" ? "warning" : "secondary"}>
+                    {String(item.status)}
+                  </Badge>
                 </div>
-                <p className="text-slate-500">{isPayer ? `From @${requester?.username}` : `To @${payer?.username}`}</p>
+                <p className="text-slate-500">
+                  {isPayer ? `From @${requester?.username}` : `To @${payer?.username}`}
+                </p>
                 {String(item.status) === "PENDING" && (
                   <div className="mt-2 flex gap-2">
                     {isPayer && (
                       <>
-                        <Button size="sm" loading={pending} onClick={() => start(async () => { const r = await payMoneyRequestAction(String(item.id)); r.ok ? (push("Paid"), load()) : push(r.error, "error"); })}>Pay</Button>
-                        <Button size="sm" variant="outline" onClick={() => start(async () => { await declineMoneyRequestAction(String(item.id)); load(); })}>Decline</Button>
+                        <Button
+                          size="sm"
+                          loading={pending}
+                          onClick={() =>
+                            start(async () => {
+                              const r = await payMoneyRequestAction(String(item.id));
+                              r.ok ? (push("Paid"), load()) : push(r.error, "error");
+                            })
+                          }
+                        >
+                          Pay
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() =>
+                            start(async () => {
+                              await declineMoneyRequestAction(String(item.id));
+                              load();
+                            })
+                          }
+                        >
+                          Decline
+                        </Button>
                       </>
                     )}
                     {isRequester && (
-                      <Button size="sm" variant="outline" onClick={() => start(async () => { await cancelMoneyRequestAction(String(item.id)); load(); })}>Cancel</Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() =>
+                          start(async () => {
+                            await cancelMoneyRequestAction(String(item.id));
+                            load();
+                          })
+                        }
+                      >
+                        Cancel
+                      </Button>
                     )}
                   </div>
                 )}

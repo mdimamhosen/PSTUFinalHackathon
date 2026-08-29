@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import Link from "next/link";
 import { LayoutShell } from "@relay/ui";
 import { logoutAction } from "@/lib/actions";
@@ -19,9 +19,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       nav={nav}
       actions={
         <div className="flex gap-2">
-          <Link href="/notifications" className="text-sm">🔔</Link>
+          <Link href="/notifications" className="text-sm">
+            🔔
+          </Link>
           <form action={logoutAction}>
-            <Button type="submit" variant="ghost" size="sm">Out</Button>
+            <Button type="submit" variant="ghost" size="sm">
+              Out
+            </Button>
           </form>
         </div>
       }

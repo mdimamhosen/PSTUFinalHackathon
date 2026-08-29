@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import * as React from "react";
 import { cn } from "../lib/utils";
 
@@ -10,7 +10,8 @@ const variants: Record<Variant, string> = {
   secondary: "bg-[hsl(var(--secondary))] text-[hsl(var(--secondary-foreground))] hover:opacity-90",
   outline: "border border-[hsl(var(--border))] bg-transparent hover:bg-[hsl(var(--muted))]",
   ghost: "hover:bg-[hsl(var(--muted))]",
-  destructive: "bg-[hsl(var(--destructive))] text-[hsl(var(--destructive-foreground))] hover:opacity-90",
+  destructive:
+    "bg-[hsl(var(--destructive))] text-[hsl(var(--destructive-foreground))] hover:opacity-90",
 };
 
 const sizes: Record<Size, string> = {
@@ -26,7 +27,15 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   loading?: boolean;
 }
 
-export function Button({ className, variant = "default", size = "default", loading, children, disabled, ...props }: ButtonProps) {
+export function Button({
+  className,
+  variant = "default",
+  size = "default",
+  loading,
+  children,
+  disabled,
+  ...props
+}: ButtonProps) {
   return (
     <button
       className={cn(

@@ -1,4 +1,4 @@
-'use server';
+"use server";
 
 import { cookies } from "next/headers";
 import { mapApiError, type ApiResult } from "@relay/ui";
@@ -37,7 +37,11 @@ export async function api<T>(path: string, init?: RequestInit): Promise<ApiResul
     const res = await fetch(`${API}${path}`, { ...init, headers, cache: "no-store" });
     const json = await res.json();
     if (!json.success) {
-      return { ok: false, error: mapApiError(json.error?.code, json.error?.message), code: json.error?.code };
+      return {
+        ok: false,
+        error: mapApiError(json.error?.code, json.error?.message),
+        code: json.error?.code,
+      };
     }
     return { ok: true, data: json.data as T };
   } catch {

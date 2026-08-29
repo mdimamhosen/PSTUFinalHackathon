@@ -82,7 +82,14 @@ export class MoneyRequestsService {
   async pay(payerUserId: string, id: string, idempotencyKey: string) {
     return this.prisma.$transaction(async (db) => {
       const rows = await db.$queryRaw<
-        { id: string; status: MoneyRequestStatus; requester_user_id: string; payer_user_id: string; amount_paisa: bigint; transaction_id: string | null }[]
+        {
+          id: string;
+          status: MoneyRequestStatus;
+          requester_user_id: string;
+          payer_user_id: string;
+          amount_paisa: bigint;
+          transaction_id: string | null;
+        }[]
       >`
         SELECT id, status, requester_user_id, payer_user_id, amount_paisa, transaction_id
         FROM money_requests WHERE id = ${id}::uuid FOR UPDATE
@@ -126,7 +133,9 @@ export class MoneyRequestsService {
 
   async decline(payerUserId: string, id: string) {
     return this.prisma.$transaction(async (db) => {
-      const rows = await db.$queryRaw<{ id: string; status: MoneyRequestStatus; payer_user_id: string }[]>`
+      const rows = await db.$queryRaw<
+        { id: string; status: MoneyRequestStatus; payer_user_id: string }[]
+      >`
         SELECT id, status, payer_user_id FROM money_requests WHERE id = ${id}::uuid FOR UPDATE
       `;
       const req = rows[0];
@@ -147,7 +156,9 @@ export class MoneyRequestsService {
 
   async cancel(requesterUserId: string, id: string) {
     return this.prisma.$transaction(async (db) => {
-      const rows = await db.$queryRaw<{ id: string; status: MoneyRequestStatus; requester_user_id: string }[]>`
+      const rows = await db.$queryRaw<
+        { id: string; status: MoneyRequestStatus; requester_user_id: string }[]
+      >`
         SELECT id, status, requester_user_id FROM money_requests WHERE id = ${id}::uuid FOR UPDATE
       `;
       const req = rows[0];
@@ -167,8 +178,21 @@ export class MoneyRequestsService {
   }
 
   private toDto(
-    row: { id: string; amountPaisa: bigint; status: MoneyRequestStatus; note: string | null; createdAt: Date },
-    payer: { name: string; username: string; email: string; phone: string; accountNumber: string; status: UserStatus },
+    row: {
+      id: string;
+      amountPaisa: bigint;
+      status: MoneyRequestStatus;
+      note: string | null;
+      createdAt: Date;
+    },
+    payer: {
+      name: string;
+      username: string;
+      email: string;
+      phone: string;
+      accountNumber: string;
+      status: UserStatus;
+    },
   ) {
     return {
       id: row.id,

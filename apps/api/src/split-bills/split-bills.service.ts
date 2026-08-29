@@ -1,10 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import {
-  SplitBillStatus,
-  SplitShareKind,
-  SplitShareStatus,
-  TransactionType,
-} from "@prisma/client";
+import { SplitBillStatus, SplitShareKind, SplitShareStatus, TransactionType } from "@prisma/client";
 import { customAlphabet } from "nanoid";
 import { PrismaService } from "../prisma/prisma.service";
 import { ApiError, Codes } from "../common/errors";
@@ -51,7 +46,8 @@ export class SplitBillsService {
             userId: s.userId,
             shareAmountPaisa: s.amount,
             kind: s.kind,
-            status: s.kind === SplitShareKind.HOST ? SplitShareStatus.PAID : SplitShareStatus.PENDING,
+            status:
+              s.kind === SplitShareKind.HOST ? SplitShareStatus.PAID : SplitShareStatus.PENDING,
           })),
         },
       },
@@ -201,24 +197,29 @@ export class SplitBillsService {
     return { ok: true };
   }
 
-  private toDetail(
-    bill: {
+  private toDetail(bill: {
+    id: string;
+    reference: string;
+    title: string;
+    totalAmountPaisa: bigint;
+    status: SplitBillStatus;
+    createdAt: Date;
+    shares: {
       id: string;
-      reference: string;
-      title: string;
-      totalAmountPaisa: bigint;
-      status: SplitBillStatus;
-      createdAt: Date;
-      shares: {
-        id: string;
-        shareAmountPaisa: bigint;
-        kind: SplitShareKind;
-        status: SplitShareStatus;
-        user: { name: string; username: string; email: string; phone: string; accountNumber: string; status: import("@prisma/client").UserStatus };
-        transaction: { reference: string } | null;
-      }[];
-    },
-  ) {
+      shareAmountPaisa: bigint;
+      kind: SplitShareKind;
+      status: SplitShareStatus;
+      user: {
+        name: string;
+        username: string;
+        email: string;
+        phone: string;
+        accountNumber: string;
+        status: import("@prisma/client").UserStatus;
+      };
+      transaction: { reference: string } | null;
+    }[];
+  }) {
     return {
       id: bill.id,
       reference: bill.reference,

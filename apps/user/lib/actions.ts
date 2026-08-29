@@ -1,4 +1,4 @@
-'use server';
+"use server";
 
 import { redirect } from "next/navigation";
 import { randomUUID } from "crypto";
@@ -12,7 +12,10 @@ export async function registerAction(formData: FormData) {
     phone: String(formData.get("phone") ?? ""),
     password: String(formData.get("password") ?? ""),
   };
-  const res = await api<{ token: string }>("/auth/register", { method: "POST", body: JSON.stringify(body) });
+  const res = await api<{ token: string }>("/auth/register", {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
   if (!res.ok) return res;
   await setToken(res.data.token);
   redirect("/verify");
@@ -28,9 +31,11 @@ export async function loginAction(formData: FormData) {
     body: JSON.stringify(body),
   });
   if (!res.ok) return res;
-  if (res.data.user.role !== "USER") return { ok: false as const, error: "Use the admin app for admin accounts." };
+  if (res.data.user.role !== "USER")
+    return { ok: false as const, error: "Use the admin app for admin accounts." };
   await setToken(res.data.token);
-  if (res.data.user.status === "PENDING_EMAIL" || res.data.user.status === "PENDING_PHONE") redirect("/verify");
+  if (res.data.user.status === "PENDING_EMAIL" || res.data.user.status === "PENDING_PHONE")
+    redirect("/verify");
   redirect("/dashboard");
 }
 
@@ -56,20 +61,32 @@ export async function resendOtpAction() {
 }
 
 export async function getMeAction() {
-  return api<{ user: Record<string, unknown>; wallet: { balancePaisa: string; currency: string } | null }>("/auth/me");
+  return api<{
+    user: Record<string, unknown>;
+    wallet: { balancePaisa: string; currency: string } | null;
+  }>("/auth/me");
 }
 
 export async function searchUsersAction(q: string) {
-  return api<{ items: Array<{ name: string; username: string; email: string; phone: string; accountNumber: string }> }>(
-    `/users/search?q=${encodeURIComponent(q)}`,
-  );
+  return api<{
+    items: Array<{
+      name: string;
+      username: string;
+      email: string;
+      phone: string;
+      accountNumber: string;
+    }>;
+  }>(`/users/search?q=${encodeURIComponent(q)}`);
 }
 
 export async function quoteTransferAction(body: Record<string, string>) {
-  return api<{ quote: Record<string, string>; recipient: Record<string, string> }>("/transfers/quote", {
-    method: "POST",
-    body: JSON.stringify(body),
-  });
+  return api<{ quote: Record<string, string>; recipient: Record<string, string> }>(
+    "/transfers/quote",
+    {
+      method: "POST",
+      body: JSON.stringify(body),
+    },
+  );
 }
 
 export async function confirmTransferAction(body: Record<string, string>) {
@@ -89,7 +106,11 @@ export async function getTransferAction(id: string) {
   return api(`/transfers/${id}`);
 }
 
-export async function createMoneyRequestAction(body: { toUsername: string; amountPaisa: string; note?: string }) {
+export async function createMoneyRequestAction(body: {
+  toUsername: string;
+  amountPaisa: string;
+  note?: string;
+}) {
   return api("/money-requests", { method: "POST", body: JSON.stringify(body) });
 }
 
@@ -99,7 +120,11 @@ export async function listMoneyRequestsAction(cursor?: string) {
 }
 
 export async function payMoneyRequestAction(id: string) {
-  return api(`/money-requests/${id}/pay`, { method: "POST", body: "{}", idempotencyKey: randomUUID() });
+  return api(`/money-requests/${id}/pay`, {
+    method: "POST",
+    body: "{}",
+    idempotencyKey: randomUUID(),
+  });
 }
 
 export async function declineMoneyRequestAction(id: string) {
@@ -142,7 +167,11 @@ export async function getSplitBillAction(id: string) {
 }
 
 export async function paySplitShareAction(billId: string, shareId: string) {
-  return api(`/split-bills/${billId}/shares/${shareId}/pay`, { method: "POST", body: "{}", idempotencyKey: randomUUID() });
+  return api(`/split-bills/${billId}/shares/${shareId}/pay`, {
+    method: "POST",
+    body: "{}",
+    idempotencyKey: randomUUID(),
+  });
 }
 
 export async function declineSplitShareAction(billId: string, shareId: string) {
@@ -168,7 +197,9 @@ export async function readNotificationAction(id: string) {
 }
 
 export async function listTrustedContactsAction() {
-  return api<Array<{ id: string; trusted: Record<string, string>; createdAt: string }>>("/trusted-contacts");
+  return api<Array<{ id: string; trusted: Record<string, string>; createdAt: string }>>(
+    "/trusted-contacts",
+  );
 }
 
 export async function addTrustedContactAction(username: string, password: string) {
@@ -180,5 +211,7 @@ export async function removeTrustedContactAction(id: string) {
 }
 
 export async function listRewardsAction() {
-  return api<Array<{ useCase: string; amountPaisa: string; sourceId: string; createdAt: string }>>("/rewards");
+  return api<Array<{ useCase: string; amountPaisa: string; sourceId: string; createdAt: string }>>(
+    "/rewards",
+  );
 }

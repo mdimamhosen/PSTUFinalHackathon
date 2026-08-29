@@ -36,25 +36,33 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 write("apps/user/app/layout.tsx", sharedLayout("user"));
 write("apps/admin/app/layout.tsx", sharedLayout("admin"));
 
-write("apps/user/app/page.tsx", `import { redirect } from "next/navigation";
+write(
+  "apps/user/app/page.tsx",
+  `import { redirect } from "next/navigation";
 import { getToken } from "@/lib/api";
 
 export default async function Home() {
   const token = await getToken();
   redirect(token ? "/dashboard" : "/login");
 }
-`);
+`,
+);
 
-write("apps/admin/app/page.tsx", `import { redirect } from "next/navigation";
+write(
+  "apps/admin/app/page.tsx",
+  `import { redirect } from "next/navigation";
 import { getToken } from "@/lib/api";
 
 export default async function Home() {
   const token = await getToken();
   redirect(token ? "/users" : "/login");
 }
-`);
+`,
+);
 
-write("apps/user/components/auth-form.tsx", `'use client';
+write(
+  "apps/user/components/auth-form.tsx",
+  `'use client';
 import { useState, useTransition } from "react";
 import { Button, Input, Card, CardContent, CardHeader, CardTitle } from "@relay/ui";
 import { useToast } from "@relay/ui";
@@ -102,9 +110,12 @@ export function AuthForm({
     </Card>
   );
 }
-`);
+`,
+);
 
-write("apps/user/app/login/page.tsx", `import Link from "next/link";
+write(
+  "apps/user/app/login/page.tsx",
+  `import Link from "next/link";
 import { AuthForm } from "@/components/auth-form";
 import { loginAction } from "@/lib/actions";
 
@@ -131,9 +142,12 @@ export default function LoginPage() {
     </div>
   );
 }
-`);
+`,
+);
 
-write("apps/user/app/register/page.tsx", `import Link from "next/link";
+write(
+  "apps/user/app/register/page.tsx",
+  `import Link from "next/link";
 import { AuthForm } from "@/components/auth-form";
 import { registerAction } from "@/lib/actions";
 
@@ -163,9 +177,12 @@ export default function RegisterPage() {
     </div>
   );
 }
-`);
+`,
+);
 
-write("apps/user/app/verify/page.tsx", `'use client';
+write(
+  "apps/user/app/verify/page.tsx",
+  `'use client';
 import { useEffect, useState, useTransition } from "react";
 import { Button, Input, Card, CardContent, CardHeader, CardTitle, CardDescription } from "@relay/ui";
 import { useToast } from "@relay/ui";
@@ -230,9 +247,12 @@ export default function VerifyPage() {
     </div>
   );
 }
-`);
+`,
+);
 
-write("apps/user/app/(app)/layout.tsx", `import { redirect } from "next/navigation";
+write(
+  "apps/user/app/(app)/layout.tsx",
+  `import { redirect } from "next/navigation";
 import { getToken } from "@/lib/api";
 import { AppShell } from "@/components/app-shell";
 
@@ -241,9 +261,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   if (!token) redirect("/login");
   return <AppShell>{children}</AppShell>;
 }
-`);
+`,
+);
 
-write("apps/user/components/app-shell.tsx", `'use client';
+write(
+  "apps/user/components/app-shell.tsx",
+  `'use client';
 import Link from "next/link";
 import { LayoutShell } from "@relay/ui";
 import { logoutAction } from "@/lib/actions";
@@ -275,9 +298,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     </LayoutShell>
   );
 }
-`);
+`,
+);
 
-write("apps/user/app/(app)/dashboard/page.tsx", `import Link from "next/link";
+write(
+  "apps/user/app/(app)/dashboard/page.tsx",
+  `import Link from "next/link";
 import { getMeAction } from "@/lib/actions";
 import { Card, CardContent, CardHeader, CardTitle, formatPaisa, Badge } from "@relay/ui";
 
@@ -328,9 +354,12 @@ export default async function DashboardPage() {
     </div>
   );
 }
-`);
+`,
+);
 
-write("apps/user/components/send-flow.tsx", `'use client';
+write(
+  "apps/user/components/send-flow.tsx",
+  `'use client';
 import { useState, useTransition } from "react";
 import { Button, Input, Card, CardContent, CardHeader, CardTitle, formatPaisa, parseTakaInput } from "@relay/ui";
 import { useToast } from "@relay/ui";
@@ -466,16 +495,22 @@ export function SendFlow({ preset?: Record<string, string> }) {
     </div>
   );
 }
-`);
+`,
+);
 
-write("apps/user/app/(app)/send/page.tsx", `import { SendFlow } from "@/components/send-flow";
+write(
+  "apps/user/app/(app)/send/page.tsx",
+  `import { SendFlow } from "@/components/send-flow";
 
 export default function SendPage() {
   return <SendFlow />;
 }
-`);
+`,
+);
 
-write("apps/user/app/(app)/send/receipt/[id]/page.tsx", `import { getTransferAction } from "@/lib/actions";
+write(
+  "apps/user/app/(app)/send/receipt/[id]/page.tsx",
+  `import { getTransferAction } from "@/lib/actions";
 import { Card, CardContent, CardHeader, CardTitle, formatPaisa, Badge } from "@relay/ui";
 
 export default async function ReceiptPage({ params }: { params: Promise<{ id: string }> }) {
@@ -494,9 +529,12 @@ export default async function ReceiptPage({ params }: { params: Promise<{ id: st
     </Card>
   );
 }
-`);
+`,
+);
 
-write("apps/user/components/request-panel.tsx", `'use client';
+write(
+  "apps/user/components/request-panel.tsx",
+  `'use client';
 import { useEffect, useState, useTransition } from "react";
 import { Button, Input, Card, CardContent, CardHeader, CardTitle, formatPaisa, parseTakaInput, Badge } from "@relay/ui";
 import { useToast } from "@relay/ui";
@@ -592,13 +630,19 @@ export function RequestPanel() {
     </div>
   );
 }
-`);
+`,
+);
 
-write("apps/user/app/(app)/request/page.tsx", `import { RequestPanel } from "@/components/request-panel";
+write(
+  "apps/user/app/(app)/request/page.tsx",
+  `import { RequestPanel } from "@/components/request-panel";
 export default function RequestPage() { return <RequestPanel />; }
-`);
+`,
+);
 
-write("apps/user/components/receive-panel.tsx", `'use client';
+write(
+  "apps/user/components/receive-panel.tsx",
+  `'use client';
 import { useEffect, useState, useTransition } from "react";
 import { Button, Input, Card, CardContent, CardHeader, CardTitle, formatPaisa, parseTakaInput } from "@relay/ui";
 import { useToast } from "@relay/ui";
@@ -686,13 +730,19 @@ export function ReceivePanel() {
     </div>
   );
 }
-`);
+`,
+);
 
-write("apps/user/app/(app)/receive/page.tsx", `import { ReceivePanel } from "@/components/receive-panel";
+write(
+  "apps/user/app/(app)/receive/page.tsx",
+  `import { ReceivePanel } from "@/components/receive-panel";
 export default function ReceivePage() { return <ReceivePanel />; }
-`);
+`,
+);
 
-write("apps/user/app/pay/l/[token]/page.tsx", `import { resolvePayAction } from "@/lib/actions";
+write(
+  "apps/user/app/pay/l/[token]/page.tsx",
+  `import { resolvePayAction } from "@/lib/actions";
 import { redirect } from "next/navigation";
 import { SendFlow } from "@/components/send-flow";
 
@@ -709,9 +759,12 @@ export default async function PayLinkPage({ params }: { params: Promise<{ token:
     </div>
   );
 }
-`);
+`,
+);
 
-write("apps/user/components/split-panel.tsx", `'use client';
+write(
+  "apps/user/components/split-panel.tsx",
+  `'use client';
 import { useEffect, useState, useTransition } from "react";
 import { Button, Input, Card, CardContent, CardHeader, CardTitle, formatPaisa, parseTakaInput, Badge } from "@relay/ui";
 import { useToast } from "@relay/ui";
@@ -806,13 +859,19 @@ export function SplitPanel() {
     </div>
   );
 }
-`);
+`,
+);
 
-write("apps/user/app/(app)/split/page.tsx", `import { SplitPanel } from "@/components/split-panel";
+write(
+  "apps/user/app/(app)/split/page.tsx",
+  `import { SplitPanel } from "@/components/split-panel";
 export default function SplitPage() { return <SplitPanel />; }
-`);
+`,
+);
 
-write("apps/user/app/(app)/activity/page.tsx", `'use client';
+write(
+  "apps/user/app/(app)/activity/page.tsx",
+  `'use client';
 import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle, formatPaisa, Skeleton } from "@relay/ui";
@@ -855,9 +914,12 @@ export default function ActivityPage() {
     </div>
   );
 }
-`);
+`,
+);
 
-write("apps/user/app/(app)/notifications/page.tsx", `'use client';
+write(
+  "apps/user/app/(app)/notifications/page.tsx",
+  `'use client';
 import { useEffect, useState, useTransition } from "react";
 import { Card, CardContent, CardHeader, CardTitle, Button } from "@relay/ui";
 import { listNotificationsAction, readNotificationAction } from "@/lib/actions";
@@ -893,9 +955,12 @@ export default function NotificationsPage() {
     </Card>
   );
 }
-`);
+`,
+);
 
-write("apps/user/app/(app)/contacts/page.tsx", `'use client';
+write(
+  "apps/user/app/(app)/contacts/page.tsx",
+  `'use client';
 import { useEffect, useState, useTransition } from "react";
 import { Button, Input, Card, CardContent, CardHeader, CardTitle } from "@relay/ui";
 import { useToast } from "@relay/ui";
@@ -943,9 +1008,12 @@ export default function ContactsPage() {
     </div>
   );
 }
-`);
+`,
+);
 
-write("apps/user/app/(app)/rewards/page.tsx", `'use client';
+write(
+  "apps/user/app/(app)/rewards/page.tsx",
+  `'use client';
 import { useEffect, useState, useTransition } from "react";
 import { Card, CardContent, CardHeader, CardTitle, formatPaisa } from "@relay/ui";
 import { listRewardsAction } from "@/lib/actions";
@@ -970,9 +1038,12 @@ export default function RewardsPage() {
     </Card>
   );
 }
-`);
+`,
+);
 
-write("apps/admin/app/login/page.tsx", `import { AuthForm } from "@/components/auth-form";
+write(
+  "apps/admin/app/login/page.tsx",
+  `import { AuthForm } from "@/components/auth-form";
 import { loginAction } from "@/lib/actions";
 
 export default function AdminLoginPage() {
@@ -993,9 +1064,12 @@ export default function AdminLoginPage() {
     </div>
   );
 }
-`);
+`,
+);
 
-write("apps/admin/components/auth-form.tsx", `'use client';
+write(
+  "apps/admin/components/auth-form.tsx",
+  `'use client';
 import { useTransition } from "react";
 import { Button, Input, Card, CardContent, CardHeader, CardTitle } from "@relay/ui";
 import { useToast } from "@relay/ui";
@@ -1027,9 +1101,12 @@ export function AuthForm({ action, fields, submitLabel }: {
     </Card>
   );
 }
-`);
+`,
+);
 
-write("apps/admin/app/(admin)/layout.tsx", `import { redirect } from "next/navigation";
+write(
+  "apps/admin/app/(admin)/layout.tsx",
+  `import { redirect } from "next/navigation";
 import { getToken } from "@/lib/api";
 import Link from "next/link";
 import { logoutAction } from "@/lib/actions";
@@ -1064,9 +1141,12 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     </div>
   );
 }
-`);
+`,
+);
 
-write("apps/admin/app/(admin)/users/page.tsx", `'use client';
+write(
+  "apps/admin/app/(admin)/users/page.tsx",
+  `'use client';
 import { useEffect, useState, useTransition } from "react";
 import { Button, Input, Card, CardContent, CardHeader, CardTitle, Badge } from "@relay/ui";
 import { useToast } from "@relay/ui";
@@ -1118,9 +1198,12 @@ export default function UsersPage() {
     </Card>
   );
 }
-`);
+`,
+);
 
-write("apps/admin/app/(admin)/transactions/page.tsx", `'use client';
+write(
+  "apps/admin/app/(admin)/transactions/page.tsx",
+  `'use client';
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, formatPaisa, Badge } from "@relay/ui";
 import { listTransactionsAction } from "@/lib/actions";
@@ -1150,9 +1233,12 @@ export default function TransactionsPage() {
     </Card>
   );
 }
-`);
+`,
+);
 
-write("apps/admin/app/(admin)/audit/page.tsx", `'use client';
+write(
+  "apps/admin/app/(admin)/audit/page.tsx",
+  `'use client';
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@relay/ui";
 import { listAuditLogsAction } from "@/lib/actions";
@@ -1174,9 +1260,12 @@ export default function AuditPage() {
     </Card>
   );
 }
-`);
+`,
+);
 
-write("apps/admin/app/(admin)/reconciliation/page.tsx", `import { getReconciliationAction } from "@/lib/actions";
+write(
+  "apps/admin/app/(admin)/reconciliation/page.tsx",
+  `import { getReconciliationAction } from "@/lib/actions";
 import { Card, CardContent, CardHeader, CardTitle, Badge } from "@relay/ui";
 
 export default async function ReconciliationPage() {
@@ -1194,9 +1283,12 @@ export default async function ReconciliationPage() {
     </Card>
   );
 }
-`);
+`,
+);
 
-write("apps/admin/app/(admin)/abuse/page.tsx", `'use client';
+write(
+  "apps/admin/app/(admin)/abuse/page.tsx",
+  `'use client';
 import { useEffect, useState, useTransition } from "react";
 import { Button, Card, CardContent, CardHeader, CardTitle, Badge } from "@relay/ui";
 import { useToast } from "@relay/ui";
@@ -1239,6 +1331,7 @@ export default function AbusePage() {
     </Card>
   );
 }
-`);
+`,
+);
 
 console.log("Wrote page files.");

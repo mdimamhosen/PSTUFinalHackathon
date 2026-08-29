@@ -58,11 +58,7 @@ export class SplitBillsController {
   }
 
   @Post(":id/shares/:shareId/decline")
-  decline(
-    @CurrentUser() user: User,
-    @Param("id") id: string,
-    @Param("shareId") shareId: string,
-  ) {
+  decline(@CurrentUser() user: User, @Param("id") id: string, @Param("shareId") shareId: string) {
     return this.splits.declineShare(user.id, id, shareId).then((data) => ({ success: true, data }));
   }
 

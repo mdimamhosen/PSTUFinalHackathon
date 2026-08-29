@@ -84,11 +84,7 @@ export class TransfersService {
     });
   }
 
-  async listForUser(
-    userId: string,
-    limit: number,
-    cursor: { createdAt: Date; id: string } | null,
-  ) {
+  async listForUser(userId: string, limit: number, cursor: { createdAt: Date; id: string } | null) {
     const rows = await this.prisma.transaction.findMany({
       where: {
         AND: [
@@ -183,7 +179,11 @@ export class TransfersService {
       if (this.samePayload(existing, input) && existing.status === TransactionStatus.COMPLETED) {
         return this.toDto(existing);
       }
-      throw new ApiError(Codes.IDEMPOTENCY_CONFLICT, "Idempotency key was reused with a different payload", 409);
+      throw new ApiError(
+        Codes.IDEMPOTENCY_CONFLICT,
+        "Idempotency key was reused with a different payload",
+        409,
+      );
     }
 
     if (!input.skipRisk) {
@@ -336,7 +336,13 @@ export class TransfersService {
   }
 
   private samePayload(
-    row: { toUserId: string; amountPaisa: bigint; type: TransactionType; requestId: string | null; splitShareId: string | null },
+    row: {
+      toUserId: string;
+      amountPaisa: bigint;
+      type: TransactionType;
+      requestId: string | null;
+      splitShareId: string | null;
+    },
     input: ExecuteInput,
   ) {
     return (
@@ -372,7 +378,12 @@ export class TransfersService {
       tracking: [
         { step: "Created", at: row.createdAt.toISOString() },
         {
-          step: row.status === "COMPLETED" ? "Completed" : row.status === "FAILED" ? "Failed" : "Pending",
+          step:
+            row.status === "COMPLETED"
+              ? "Completed"
+              : row.status === "FAILED"
+                ? "Failed"
+                : "Pending",
           at: row.updatedAt.toISOString(),
         },
       ],

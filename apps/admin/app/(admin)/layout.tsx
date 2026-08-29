@@ -22,11 +22,17 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             <span className="font-bold">Relay Admin</span>
             <nav className="flex gap-3 text-sm">
               {links.map((l) => (
-                <Link key={l.href} href={l.href} className="text-slate-600 hover:text-slate-900">{l.label}</Link>
+                <Link key={l.href} href={l.href} className="text-slate-600 hover:text-slate-900">
+                  {l.label}
+                </Link>
               ))}
             </nav>
           </div>
-          <form action={logoutAction}><Button type="submit" variant="outline" size="sm">Sign out</Button></form>
+          <form action={logoutAction}>
+            <Button type="submit" variant="outline" size="sm">
+              Sign out
+            </Button>
+          </form>
         </div>
       </header>
       <main className="mx-auto max-w-6xl p-4">{children}</main>

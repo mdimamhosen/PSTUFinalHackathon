@@ -7,7 +7,8 @@ export class MailerService {
 
   preview(type: string, payload: Prisma.JsonValue): string {
     if (typeof payload === "object" && payload) {
-      if ("code" in payload) return `Your verification code is ${String((payload as { code?: string }).code)}`;
+      if ("code" in payload)
+        return `Your verification code is ${String((payload as { code?: string }).code)}`;
       if ("message" in payload) return String((payload as { message?: string }).message);
     }
     return type;
@@ -51,8 +52,7 @@ export class MailerService {
   private async sendSms(payload: Prisma.JsonValue) {
     const sid = process.env.TWILIO_ACCOUNT_SID?.trim();
     const token = process.env.TWILIO_AUTH_TOKEN?.trim();
-    const from =
-      process.env.TWILIO_FROM_NUMBER?.trim() || process.env.TWILIO_PHONE_NUMBER?.trim();
+    const from = process.env.TWILIO_FROM_NUMBER?.trim() || process.env.TWILIO_PHONE_NUMBER?.trim();
     if (!sid || !token || !from) {
       this.log.warn("Twilio not configured; skipping SMS");
       return;

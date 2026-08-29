@@ -1,4 +1,4 @@
-'use server';
+"use server";
 
 import { redirect } from "next/navigation";
 import { api, setToken, clearToken } from "./api";
@@ -50,7 +50,9 @@ export async function listAuditLogsAction(cursor?: string) {
 }
 
 export async function getReconciliationAction() {
-  return api<{ status: string; walletCount: number; mismatches: unknown[] }>("/admin/reconciliation");
+  return api<{ status: string; walletCount: number; mismatches: unknown[] }>(
+    "/admin/reconciliation",
+  );
 }
 
 export async function listAbuseAction(decision?: string) {

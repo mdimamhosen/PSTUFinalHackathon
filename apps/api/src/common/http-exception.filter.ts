@@ -1,10 +1,4 @@
-import {
-  ExceptionFilter,
-  Catch,
-  ArgumentsHost,
-  HttpException,
-  HttpStatus,
-} from "@nestjs/common";
+import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus } from "@nestjs/common";
 import { Response } from "express";
 import { ApiError } from "./errors";
 
@@ -28,10 +22,16 @@ export class ApiExceptionFilter implements ExceptionFilter {
       const message =
         typeof body === "string"
           ? body
-          : ((body as { message?: string | string[] }).message ??
-            exception.message);
+          : ((body as { message?: string | string[] }).message ?? exception.message);
       const text = Array.isArray(message) ? message.join(", ") : message;
-      const code = status === 429 ? "RATE_LIMITED" : status === 401 ? "UNAUTHORIZED" : status === 403 ? "FORBIDDEN" : "INVALID_AMOUNT";
+      const code =
+        status === 429
+          ? "RATE_LIMITED"
+          : status === 401
+            ? "UNAUTHORIZED"
+            : status === 403
+              ? "FORBIDDEN"
+              : "INVALID_AMOUNT";
       return res.status(status).json({
         success: false,
         error: { code, message: text },

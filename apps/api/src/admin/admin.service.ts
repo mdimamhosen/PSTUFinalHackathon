@@ -9,7 +9,11 @@ import { decodeCursor, encodeCursor } from "../common/pagination";
 export class AdminService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async listUsers(q: string | undefined, limit: number, cursor: { createdAt: Date; id: string } | null) {
+  async listUsers(
+    q: string | undefined,
+    limit: number,
+    cursor: { createdAt: Date; id: string } | null,
+  ) {
     const term = (q ?? "").trim().toLowerCase();
     const rows = await this.prisma.user.findMany({
       where: term
@@ -101,7 +105,12 @@ export class AdminService {
 
   async reconciliation() {
     const wallets = await this.prisma.wallet.findMany({ include: { user: true } });
-    const mismatches: { userId: string; username: string; balancePaisa: string; ledgerSum: string }[] = [];
+    const mismatches: {
+      userId: string;
+      username: string;
+      balancePaisa: string;
+      ledgerSum: string;
+    }[] = [];
     for (const wallet of wallets) {
       const agg = await this.prisma.ledgerEntry.groupBy({
         by: ["direction"],
@@ -129,7 +138,9 @@ export class AdminService {
 
   async abuseQueue(decision: AbuseDecision | undefined, limit: number) {
     const rows = await this.prisma.abuseAssessment.findMany({
-      where: decision ? { decision } : { decision: { in: [AbuseDecision.ADMIN_REVIEW, AbuseDecision.BLOCK] } },
+      where: decision
+        ? { decision }
+        : { decision: { in: [AbuseDecision.ADMIN_REVIEW, AbuseDecision.BLOCK] } },
       orderBy: { createdAt: "desc" },
       take: limit,
       include: { user: true },

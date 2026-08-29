@@ -38,6 +38,4 @@ export function mapApiError(code?: string, message?: string): string {
   return message ?? "Something went wrong.";
 }
 
-export type ApiResult<T> =
-  | { ok: true; data: T }
-  | { ok: false; error: string; code?: string };
+export type ApiResult<T> = { ok: true; data: T } | { ok: false; error: string; code?: string };

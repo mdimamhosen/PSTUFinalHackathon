@@ -7,11 +7,22 @@ export default async function ReconciliationPage() {
   const d = res.data;
   return (
     <Card>
-      <CardHeader><CardTitle>Reconciliation</CardTitle></CardHeader>
+      <CardHeader>
+        <CardTitle>Reconciliation</CardTitle>
+      </CardHeader>
       <CardContent className="space-y-2">
-        <div className="flex justify-between"><span>Status</span><Badge variant={d.status === "BALANCED" ? "success" : "destructive"}>{d.status}</Badge></div>
-        <div className="flex justify-between"><span>Wallets checked</span><span>{d.walletCount}</span></div>
-        <div className="flex justify-between"><span>Mismatches</span><span>{d.mismatches.length}</span></div>
+        <div className="flex justify-between">
+          <span>Status</span>
+          <Badge variant={d.status === "BALANCED" ? "success" : "destructive"}>{d.status}</Badge>
+        </div>
+        <div className="flex justify-between">
+          <span>Wallets checked</span>
+          <span>{d.walletCount}</span>
+        </div>
+        <div className="flex justify-between">
+          <span>Mismatches</span>
+          <span>{d.mismatches.length}</span>
+        </div>
       </CardContent>
     </Card>
   );
