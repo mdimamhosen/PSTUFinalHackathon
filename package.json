@@ -11,9 +11,12 @@
     "lint": "turbo lint",
     "db:up": "docker compose up -d postgres redis",
     "db:migrate": "npm run prisma:migrate -w @relay/api",
-    "db:seed": "npm run prisma:seed -w @relay/api"
+    "db:seed": "npm run prisma:seed -w @relay/api",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "devDependencies": {
+    "prettier": "^3.9.6",
     "turbo": "^2.5.8"
   },
   "packageManager": "npm@10.9.2",
