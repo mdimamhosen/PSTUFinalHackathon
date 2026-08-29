@@ -444,8 +444,8 @@ ALTER TABLE "reward_grants" ADD CONSTRAINT "reward_grants_userId_fkey" FOREIGN K
 ALTER TABLE "abuse_assessments" ADD CONSTRAINT "abuse_assessments_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 
-ALTER TABLE wallets ADD CONSTRAINT wallets_balance_nonneg CHECK (balance_paisa >= 0);
-ALTER TABLE transactions ADD CONSTRAINT transactions_amount_positive CHECK (amount_paisa > 0);
-ALTER TABLE ledger_entries ADD CONSTRAINT ledger_amount_positive CHECK (amount_paisa > 0);
-ALTER TABLE money_requests ADD CONSTRAINT money_requests_amount_positive CHECK (amount_paisa > 0);
-ALTER TABLE reward_grants ADD CONSTRAINT reward_grants_amount_positive CHECK (amount_paisa > 0);
+ALTER TABLE "wallets" ADD CONSTRAINT wallets_balance_nonneg CHECK ("balancePaisa" >= 0);
+ALTER TABLE "transactions" ADD CONSTRAINT transactions_amount_positive CHECK ("amountPaisa" > 0);
+ALTER TABLE "ledger_entries" ADD CONSTRAINT ledger_amount_positive CHECK ("amountPaisa" > 0);
+ALTER TABLE "money_requests" ADD CONSTRAINT money_requests_amount_positive CHECK ("amountPaisa" > 0);
+ALTER TABLE "reward_grants" ADD CONSTRAINT reward_grants_amount_positive CHECK ("amountPaisa" > 0);
