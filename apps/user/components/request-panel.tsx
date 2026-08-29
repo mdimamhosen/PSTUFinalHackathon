@@ -1,19 +1,24 @@
 "use client";
 import { useEffect, useState, useTransition } from "react";
 import {
+  Badge,
   Button,
-  Input,
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-  formatPaisa,
-  parseTakaInput,
-  Badge,
-  PageHeader,
   EmptyState,
+  Field,
+  formatPaisa,
+  humanizeLabel,
+  Input,
+  PageHeader,
+  parseTakaInput,
+  Skeleton,
+  statusBadgeVariant,
+  useModal,
+  useToast,
 } from "@relay/ui";
-import { useToast } from "@relay/ui";
 import {
   createMoneyRequestAction,
   listMoneyRequestsAction,
@@ -30,12 +35,15 @@ export function RequestPanel() {
   const [note, setNote] = useState("");
   const [myUsername, setMyUsername] = useState("");
   const [pending, start] = useTransition();
+  const [loaded, setLoaded] = useState(false);
   const { push } = useToast();
+  const { confirm, alert } = useModal();
 
   const load = () =>
     start(async () => {
       const res = await listMoneyRequestsAction();
       if (res.ok) setItems(res.data.items as Array<Record<string, unknown>>);
+      setLoaded(true);
     });
 
   useEffect(() => {
@@ -51,21 +59,31 @@ export function RequestPanel() {
           <CardTitle>Request money</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          <Input
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            placeholder="Payer username"
-          />
-          <Input
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            placeholder="Amount ৳"
-          />
-          <Input
-            value={note}
-            onChange={(e) => setNote(e.target.value)}
-            placeholder="Note (optional)"
-          />
+          <Field label="Payer username" htmlFor="payer">
+            <Input
+              id="payer"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="@karim"
+            />
+          </Field>
+          <Field label="Amount (৳)" htmlFor="req-amount">
+            <Input
+              id="req-amount"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              placeholder="0.00"
+              inputMode="decimal"
+            />
+          </Field>
+          <Field label="Note" htmlFor="req-note">
+            <Input
+              id="req-note"
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              placeholder="Optional"
+            />
+          </Field>
           <Button
             className="w-full"
             loading={pending}
@@ -77,7 +95,7 @@ export function RequestPanel() {
                   note: note || undefined,
                 });
                 if (!res.ok) return push(res.error, "error");
-                push("Request sent");
+                push("Request sent", "success");
                 setUsername("");
                 setAmount("");
                 setNote("");
@@ -95,24 +113,30 @@ export function RequestPanel() {
           <CardTitle>Inbox</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
+          {pending && !loaded ? (
+            <div className="space-y-2" aria-busy="true">
+              <Skeleton className="h-16 w-full" />
+              <Skeleton className="h-16 w-full" />
+            </div>
+          ) : null}
           {items.map((item) => {
             const requester = item.requester as Record<string, string> | undefined;
             const payer = item.payer as Record<string, string>;
             const isPayer = payer?.username === myUsername;
             const isRequester = requester?.username === myUsername;
             return (
-              <div key={String(item.id)} className="rounded-lg border p-3 text-sm">
-                <div className="flex justify-between">
-                  <strong>{formatPaisa(String(item.amountPaisa))}</strong>
-                  <Badge variant={String(item.status) === "PENDING" ? "warning" : "secondary"}>
-                    {String(item.status)}
+              <div key={String(item.id)} className="rounded-xl border p-3 text-sm">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <strong className="tabular">{formatPaisa(String(item.amountPaisa))}</strong>
+                  <Badge variant={statusBadgeVariant(item.status)}>
+                    {humanizeLabel(item.status)}
                   </Badge>
                 </div>
-                <p className="text-slate-500">
+                <p className="mt-1 text-[hsl(var(--muted-foreground))]">
                   {isPayer ? `From @${requester?.username}` : `To @${payer?.username}`}
                 </p>
                 {String(item.status) === "PENDING" && (
-                  <div className="mt-2 flex gap-2">
+                  <div className="mt-2 flex flex-wrap gap-2">
                     {isPayer && (
                       <>
                         <Button
@@ -120,8 +144,23 @@ export function RequestPanel() {
                           loading={pending}
                           onClick={() =>
                             start(async () => {
+                              const ok = await confirm({
+                                title: "Pay this request?",
+                                description: `Send ${formatPaisa(String(item.amountPaisa))} to @${requester?.username}.`,
+                                confirmLabel: "Pay now",
+                              });
+                              if (!ok) return;
                               const r = await payMoneyRequestAction(String(item.id));
-                              r.ok ? (push("Paid"), load()) : push(r.error, "error");
+                              if (!r.ok) {
+                                await alert({
+                                  title: "Payment failed",
+                                  description: r.error,
+                                  variant: "error",
+                                });
+                                return;
+                              }
+                              push("Paid", "success");
+                              load();
                             })
                           }
                         >
@@ -132,7 +171,15 @@ export function RequestPanel() {
                           variant="outline"
                           onClick={() =>
                             start(async () => {
+                              const ok = await confirm({
+                                title: "Decline this request?",
+                                description: "The requester will be notified.",
+                                confirmLabel: "Decline",
+                                destructive: true,
+                              });
+                              if (!ok) return;
                               await declineMoneyRequestAction(String(item.id));
+                              push("Request declined");
                               load();
                             })
                           }
@@ -147,7 +194,15 @@ export function RequestPanel() {
                         variant="outline"
                         onClick={() =>
                           start(async () => {
+                            const ok = await confirm({
+                              title: "Cancel this request?",
+                              description: "You can create a new request later.",
+                              confirmLabel: "Cancel request",
+                              destructive: true,
+                            });
+                            if (!ok) return;
                             await cancelMoneyRequestAction(String(item.id));
+                            push("Request cancelled");
                             load();
                           })
                         }
@@ -160,9 +215,12 @@ export function RequestPanel() {
               </div>
             );
           })}
-          {!items.length ? (
-        <EmptyState title="No requests" description="Create a request or wait for someone to ask you." />
-      ) : null}
+          {loaded && !items.length ? (
+            <EmptyState
+              title="No requests"
+              description="Create a request or wait for someone to ask you."
+            />
+          ) : null}
         </CardContent>
       </Card>
     </div>

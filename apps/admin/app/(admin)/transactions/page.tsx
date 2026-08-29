@@ -1,6 +1,14 @@
 "use client";
 import { useEffect, useState, useTransition } from "react";
-import { Badge, EmptyState, formatPaisa, PageHeader, Skeleton } from "@relay/ui";
+import {
+  Badge,
+  EmptyState,
+  formatPaisa,
+  humanizeLabel,
+  PageHeader,
+  statusBadgeVariant,
+  TableSkeleton,
+} from "@relay/ui";
 import { listTransactionsAction } from "@/lib/actions";
 
 export default function TransactionsPage() {
@@ -21,7 +29,7 @@ export default function TransactionsPage() {
       <PageHeader title="Transactions" description="Read-only money movement history" />
       <div className="overflow-hidden rounded-2xl border bg-[hsl(var(--card))]">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[720px] text-left text-sm">
+          <table className="w-full min-w-[640px] text-left text-sm">
             <thead className="border-b bg-[hsl(var(--muted))]/50 text-xs uppercase tracking-wide text-[hsl(var(--muted-foreground))]">
               <tr>
                 <th className="px-4 py-3 font-semibold">Reference</th>
@@ -38,11 +46,9 @@ export default function TransactionsPage() {
                   <td className="px-4 py-3 tabular font-semibold">
                     {formatPaisa(String(t.amountPaisa))}
                   </td>
-                  <td className="px-4 py-3">{String(t.type)}</td>
+                  <td className="px-4 py-3">{humanizeLabel(t.type)}</td>
                   <td className="px-4 py-3">
-                    <Badge variant={String(t.status) === "COMPLETED" ? "success" : "secondary"}>
-                      {String(t.status)}
-                    </Badge>
+                    <Badge variant={statusBadgeVariant(t.status)}>{humanizeLabel(t.status)}</Badge>
                   </td>
                   <td className="px-4 py-3 text-[hsl(var(--muted-foreground))]">
                     {new Date(String(t.createdAt)).toLocaleString()}
@@ -52,12 +58,7 @@ export default function TransactionsPage() {
             </tbody>
           </table>
         </div>
-        {pending && !loaded ? (
-          <div className="space-y-2 p-4">
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-10 w-full" />
-          </div>
-        ) : null}
+        {pending && !loaded ? <TableSkeleton /> : null}
         {loaded && !items.length ? (
           <div className="p-4">
             <EmptyState title="No transactions" description="Completed transfers will appear here." />

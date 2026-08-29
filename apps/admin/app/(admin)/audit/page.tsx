@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState, useTransition } from "react";
-import { EmptyState, PageHeader, Skeleton } from "@relay/ui";
+import { EmptyState, humanizeLabel, PageHeader, Skeleton } from "@relay/ui";
 import { listAuditLogsAction } from "@/lib/actions";
 
 export default function AuditPage() {
@@ -20,7 +20,8 @@ export default function AuditPage() {
     <div className="space-y-4 animate-in">
       <PageHeader title="Audit logs" description="Immutable ops trail" />
       {pending && !loaded ? (
-        <div className="space-y-2">
+        <div className="space-y-2" aria-busy="true">
+          <Skeleton className="h-16 w-full" />
           <Skeleton className="h-16 w-full" />
           <Skeleton className="h-16 w-full" />
         </div>
@@ -32,9 +33,9 @@ export default function AuditPage() {
             className="rounded-2xl border bg-[hsl(var(--card))] px-4 py-3 text-sm"
           >
             <div className="font-semibold">
-              {String(l.action)}{" "}
+              {humanizeLabel(l.action)}{" "}
               <span className="font-normal text-[hsl(var(--muted-foreground))]">
-                · {String(l.entityType)}
+                · {humanizeLabel(l.entityType)}
               </span>
             </div>
             <div className="mt-1 text-xs text-[hsl(var(--muted-foreground))]">

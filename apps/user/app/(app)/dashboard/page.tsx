@@ -5,9 +5,10 @@ import {
   Badge,
   Card,
   CardContent,
-  EmptyState,
   formatPaisa,
+  humanizeLabel,
   PageHeader,
+  statusBadgeVariant,
 } from "@relay/ui";
 import { IconReceive, IconRequest, IconSend, IconSplit } from "@/components/icons";
 
@@ -47,10 +48,10 @@ export default async function DashboardPage() {
             {String(user.accountNumber)}
           </span>
           <Badge
-            variant={user.status === "ACTIVE" ? "success" : "warning"}
+            variant={statusBadgeVariant(user.status)}
             className="bg-white/15 text-white ring-white/20"
           >
-            {String(user.status)}
+            {humanizeLabel(user.status)}
           </Badge>
         </div>
       </section>
@@ -64,7 +65,7 @@ export default async function DashboardPage() {
         </Alert>
       ) : null}
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {actions.map((a) => (
           <Link
             key={a.href}

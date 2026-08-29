@@ -17,8 +17,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     <AdminShell
       nav={links}
       actions={
-        <form action={logoutAction}>
-          <Button type="submit" variant="outline" size="sm">
+        <form action={logoutAction} className="w-full">
+          <Button type="submit" variant="outline" size="sm" className="w-full">
             Sign out
           </Button>
         </form>

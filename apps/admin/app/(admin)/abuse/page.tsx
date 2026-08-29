@@ -4,10 +4,13 @@ import {
   Badge,
   Button,
   EmptyState,
+  humanizeLabel,
   PageHeader,
-  Skeleton,
+  statusBadgeVariant,
+  TableSkeleton,
+  useModal,
+  useToast,
 } from "@relay/ui";
-import { useToast } from "@relay/ui";
 import { listAbuseAction, allowAbuseAction } from "@/lib/actions";
 
 export default function AbusePage() {
@@ -15,6 +18,7 @@ export default function AbusePage() {
   const [pending, start] = useTransition();
   const [loaded, setLoaded] = useState(false);
   const { push } = useToast();
+  const { confirm } = useModal();
 
   const load = () =>
     start(async () => {
@@ -31,27 +35,20 @@ export default function AbusePage() {
     <div className="space-y-4 animate-in">
       <PageHeader
         title="Abuse queue"
-        description="ALLOW does not edit balances — movement only"
+        description="Review flagged accounts. Allowing a user does not change wallet balances."
       />
-      {pending && !loaded ? (
-        <div className="space-y-2">
-          <Skeleton className="h-20 w-full" />
-          <Skeleton className="h-20 w-full" />
-        </div>
-      ) : null}
+      {pending && !loaded ? <TableSkeleton rows={3} /> : null}
       <div className="space-y-2">
         {items.map((a) => (
           <div
             key={String(a.id)}
             className="flex flex-col gap-3 rounded-2xl border bg-[hsl(var(--card))] p-4 sm:flex-row sm:items-center sm:justify-between"
           >
-            <div>
-              <div className="font-semibold">@{String(a.username ?? a.userId)}</div>
+            <div className="min-w-0">
+              <div className="font-semibold truncate">@{String(a.username ?? a.userId)}</div>
               <div className="mt-1 flex flex-wrap items-center gap-2">
-                <Badge variant={String(a.decision) === "BLOCK" ? "destructive" : "warning"}>
-                  {String(a.decision)}
-                </Badge>
-                <Badge variant="outline">{String(a.engine)}</Badge>
+                <Badge variant={statusBadgeVariant(a.decision)}>{humanizeLabel(a.decision)}</Badge>
+                <Badge variant="outline">{humanizeLabel(a.engine)}</Badge>
                 <span className="text-xs text-[hsl(var(--muted-foreground))]">
                   Score {String(a.score)}
                 </span>
@@ -59,10 +56,18 @@ export default function AbusePage() {
             </div>
             <Button
               size="sm"
+              className="shrink-0"
               onClick={() =>
                 start(async () => {
                   const uid = String(a.userId ?? "");
                   if (!uid) return;
+                  const ok = await confirm({
+                    title: "Allow this user?",
+                    description:
+                      "They will leave the abuse queue and regain normal transfer access. Balances are not changed.",
+                    confirmLabel: "Allow user",
+                  });
+                  if (!ok) return;
                   await allowAbuseAction(uid);
                   push("User allowed", "success");
                   load();
@@ -75,7 +80,10 @@ export default function AbusePage() {
         ))}
       </div>
       {loaded && !items.length ? (
-        <EmptyState title="Queue empty" description="No ADMIN_REVIEW or BLOCK assessments." />
+        <EmptyState
+          title="Queue empty"
+          description="No accounts currently need admin review or are blocked."
+        />
       ) : null}
     </div>
   );

@@ -14,12 +14,20 @@ import {
   PageHeader,
   formatPaisa,
   parseTakaInput,
+  useModal,
+  useToast,
 } from "@relay/ui";
-import { useToast } from "@relay/ui";
 import { searchUsersAction, quoteTransferAction, confirmTransferAction } from "@/lib/actions";
 import Link from "next/link";
 
 type Step = "search" | "amount" | "confirm" | "done";
+
+const stepLabel: Record<Step, string> = {
+  search: "Search",
+  amount: "Amount",
+  confirm: "Confirm",
+  done: "Done",
+};
 
 function buildRecipientField(
   recipient: Record<string, string> | null,
@@ -46,6 +54,7 @@ export function SendFlow({ preset }: { preset?: Record<string, string> } = {}) {
   const [receipt, setReceipt] = useState<Record<string, unknown> | null>(null);
   const [pending, start] = useTransition();
   const { push } = useToast();
+  const { confirm, alert } = useModal();
 
   return (
     <div className="space-y-4 animate-in">
@@ -54,7 +63,7 @@ export function SendFlow({ preset }: { preset?: Record<string, string> } = {}) {
         description="Search, quote, then confirm — nothing moves until you confirm."
       />
 
-      <div className="flex gap-2 text-xs font-medium text-[hsl(var(--muted-foreground))]">
+      <div className="flex flex-wrap gap-2 text-xs font-medium text-[hsl(var(--muted-foreground))]">
         {(["search", "amount", "confirm", "done"] as Step[]).map((s, i) => (
           <span
             key={s}
@@ -64,7 +73,7 @@ export function SendFlow({ preset }: { preset?: Record<string, string> } = {}) {
                 : "bg-[hsl(var(--muted))]"
             }`}
           >
-            {i + 1}. {s}
+            {i + 1}. {stepLabel[s]}
           </span>
         ))}
       </div>
@@ -209,13 +218,26 @@ export function SendFlow({ preset }: { preset?: Record<string, string> } = {}) {
                 loading={pending}
                 onClick={() =>
                   start(async () => {
+                    const ok = await confirm({
+                      title: "Send this payment?",
+                      description: `You will send ${quote.youSend} to @${recipient?.username || recipient?.accountNumber}. This cannot be undone.`,
+                      confirmLabel: "Confirm & pay",
+                    });
+                    if (!ok) return;
                     const body: Record<string, string> = {
                       ...buildRecipientField(recipient, preset),
                       amountPaisa: parseTakaInput(amount),
                       description: "Relay transfer",
                     };
                     const res = await confirmTransferAction(body);
-                    if (!res.ok) return push(res.error, "error");
+                    if (!res.ok) {
+                      await alert({
+                        title: "Payment failed",
+                        description: res.error,
+                        variant: "error",
+                      });
+                      return;
+                    }
                     setReceipt(res.data as Record<string, unknown>);
                     setStep("done");
                     push("Payment sent", "success");

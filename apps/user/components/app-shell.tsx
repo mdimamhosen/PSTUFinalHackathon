@@ -1,15 +1,28 @@
 "use client";
-import Link from "next/link";
 import { BrandMark, Button, LayoutShell } from "@relay/ui";
 import { logoutAction } from "@/lib/actions";
-import { IconBell, IconHome, IconMore, IconReceive, IconRequest, IconSend } from "./icons";
+import {
+  IconActivity,
+  IconBell,
+  IconContacts,
+  IconHome,
+  IconReceive,
+  IconRequest,
+  IconRewards,
+  IconSend,
+  IconSplit,
+} from "./icons";
 
 const nav = [
   { href: "/dashboard", label: "Home", icon: <IconHome />, match: "/dashboard" },
   { href: "/send", label: "Send", icon: <IconSend />, match: "/send" },
   { href: "/request", label: "Request", icon: <IconRequest />, match: "/request" },
   { href: "/receive", label: "Receive", icon: <IconReceive />, match: "/receive" },
-  { href: "/activity", label: "More", icon: <IconMore />, match: "/activity" },
+  { href: "/split", label: "Split", icon: <IconSplit />, match: "/split" },
+  { href: "/activity", label: "Activity", icon: <IconActivity />, match: "/activity" },
+  { href: "/contacts", label: "Contacts", icon: <IconContacts />, match: "/contacts" },
+  { href: "/rewards", label: "Rewards", icon: <IconRewards />, match: "/rewards" },
+  { href: "/notifications", label: "Alerts", icon: <IconBell />, match: "/notifications" },
 ];
 
 export function AppShell({ children }: { children: React.ReactNode }) {
@@ -18,20 +31,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       brand={<BrandMark />}
       nav={nav}
       actions={
-        <>
-          <Link
-            href="/notifications"
-            className="inline-flex size-10 items-center justify-center rounded-xl text-[hsl(var(--muted-foreground))] transition hover:bg-[hsl(var(--muted))] hover:text-[hsl(var(--foreground))]"
-            aria-label="Notifications"
-          >
-            <IconBell />
-          </Link>
-          <form action={logoutAction}>
-            <Button type="submit" variant="ghost" size="sm">
-              Sign out
-            </Button>
-          </form>
-        </>
+        <form action={logoutAction} className="w-full">
+          <Button type="submit" variant="outline" size="sm" className="w-full">
+            Sign out
+          </Button>
+        </form>
       }
     >
       {children}

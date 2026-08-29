@@ -1,5 +1,14 @@
 import { getReconciliationAction } from "@/lib/actions";
-import { Alert, Badge, Card, CardContent, EmptyState, PageHeader } from "@relay/ui";
+import {
+  Alert,
+  Badge,
+  Card,
+  CardContent,
+  EmptyState,
+  humanizeLabel,
+  PageHeader,
+  statusBadgeVariant,
+} from "@relay/ui";
 
 export default async function ReconciliationPage() {
   const res = await getReconciliationAction();
@@ -25,7 +34,7 @@ export default async function ReconciliationPage() {
               Status
             </p>
             <div className="mt-2">
-              <Badge variant={balanced ? "success" : "destructive"}>{d.status}</Badge>
+              <Badge variant={statusBadgeVariant(d.status)}>{humanizeLabel(d.status)}</Badge>
             </div>
           </CardContent>
         </Card>
@@ -49,7 +58,7 @@ export default async function ReconciliationPage() {
       {balanced ? (
         <EmptyState
           title="All wallets balanced"
-          description="Every wallet balance_paisa matches its ledger SUM."
+          description="Every wallet balance matches its ledger sum."
         />
       ) : (
         <Alert variant="error" title="Integrity mismatch">

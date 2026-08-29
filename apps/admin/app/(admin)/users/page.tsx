@@ -4,11 +4,14 @@ import {
   Badge,
   Button,
   EmptyState,
+  humanizeLabel,
   Input,
   PageHeader,
-  Skeleton,
+  statusBadgeVariant,
+  TableSkeleton,
+  useModal,
+  useToast,
 } from "@relay/ui";
-import { useToast } from "@relay/ui";
 import { listUsersAction, suspendUserAction, unsuspendUserAction } from "@/lib/actions";
 
 export default function UsersPage() {
@@ -17,6 +20,7 @@ export default function UsersPage() {
   const [pending, start] = useTransition();
   const [loaded, setLoaded] = useState(false);
   const { push } = useToast();
+  const { confirm, alert } = useModal();
 
   const load = (query = q) =>
     start(async () => {
@@ -45,7 +49,7 @@ export default function UsersPage() {
       </div>
       <div className="overflow-hidden rounded-2xl border bg-[hsl(var(--card))]">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[720px] text-left text-sm">
+          <table className="w-full min-w-[640px] text-left text-sm">
             <thead className="border-b bg-[hsl(var(--muted))]/50 text-xs uppercase tracking-wide text-[hsl(var(--muted-foreground))]">
               <tr>
                 <th className="px-4 py-3 font-semibold">User</th>
@@ -64,12 +68,12 @@ export default function UsersPage() {
                     </div>
                   </td>
                   <td className="px-4 py-3">
-                    <Badge variant={String(u.status) === "ACTIVE" ? "success" : "warning"}>
-                      {String(u.status)}
-                    </Badge>
+                    <Badge variant={statusBadgeVariant(u.status)}>{humanizeLabel(u.status)}</Badge>
                   </td>
                   <td className="px-4 py-3">
-                    <Badge variant="outline">{String(u.abuseDecision)}</Badge>
+                    <Badge variant={statusBadgeVariant(u.abuseDecision)}>
+                      {humanizeLabel(u.abuseDecision)}
+                    </Badge>
                   </td>
                   <td className="px-4 py-3 text-right">
                     {String(u.status) !== "SUSPENDED" ? (
@@ -78,6 +82,13 @@ export default function UsersPage() {
                         variant="destructive"
                         onClick={() =>
                           start(async () => {
+                            const ok = await confirm({
+                              title: "Suspend this user?",
+                              description: `@${String(u.username)} will not be able to send or receive money until unsuspended.`,
+                              confirmLabel: "Suspend",
+                              destructive: true,
+                            });
+                            if (!ok) return;
                             await suspendUserAction(String(u.id));
                             push("User suspended", "success");
                             load();
@@ -92,9 +103,20 @@ export default function UsersPage() {
                         variant="outline"
                         onClick={() =>
                           start(async () => {
+                            const ok = await confirm({
+                              title: "Unsuspend this user?",
+                              description: `@${String(u.username)} will regain wallet access.`,
+                              confirmLabel: "Unsuspend",
+                            });
+                            if (!ok) return;
                             const res = await unsuspendUserAction(String(u.id));
-                            if (res && "ok" in res && res.ok === false) push(res.error ?? "Failed", "error");
-                            else {
+                            if (res && "ok" in res && res.ok === false) {
+                              await alert({
+                                title: "Could not unsuspend",
+                                description: res.error ?? "Something went wrong.",
+                                variant: "error",
+                              });
+                            } else {
                               push("User unsuspended", "success");
                               load();
                             }
@@ -110,12 +132,7 @@ export default function UsersPage() {
             </tbody>
           </table>
         </div>
-        {pending && !loaded ? (
-          <div className="space-y-2 p-4">
-            <Skeleton className="h-12 w-full" />
-            <Skeleton className="h-12 w-full" />
-          </div>
-        ) : null}
+        {pending && !loaded ? <TableSkeleton /> : null}
         {loaded && !items.length ? (
           <div className="p-4">
             <EmptyState title="No users found" description="Try a different search query." />
