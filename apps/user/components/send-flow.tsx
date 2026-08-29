@@ -7,7 +7,7 @@ import Link from "next/link";
 
 type Step = "search" | "amount" | "confirm" | "done";
 
-export function SendFlow({ preset?: Record<string, string> }) {
+export function SendFlow({ preset }: { preset?: Record<string, string> } = {}) {
   const [step, setStep] = useState<Step>(preset ? "amount" : "search");
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Array<Record<string, string>>>([]);

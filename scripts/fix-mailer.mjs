@@ -1,4 +1,5 @@
-import { Injectable, Logger } from "@nestjs/common";
+import fs from "fs";
+const content = `import { Injectable, Logger } from "@nestjs/common";
 import { Prisma } from "@prisma/client";
 
 @Injectable()
@@ -7,14 +8,14 @@ export class MailerService {
 
   preview(type: string, payload: Prisma.JsonValue): string {
     if (typeof payload === "object" && payload) {
-      if ("code" in payload) return `Your verification code is ${String((payload as { code?: string }).code)}`;
+      if ("code" in payload) return \`Your verification code is \${String((payload as { code?: string }).code)}\`;
       if ("message" in payload) return String((payload as { message?: string }).message);
     }
     return type;
   }
 
   async dispatch(type: string, payload: Prisma.JsonValue, recipientUserId: string | null) {
-    this.log.log(`mail ${type} -> ${recipientUserId}`);
+    this.log.log(\`mail \${type} -> \${recipientUserId}\`);
     if (process.env.SMTP_HOST) {
       const nodemailer = await import("nodemailer");
       const transport = nodemailer.createTransport({
@@ -30,7 +31,7 @@ export class MailerService {
         await transport.sendMail({
           from: process.env.SMTP_FROM ?? "Relay <noreply@relay.local>",
           to,
-          subject: `Relay: ${type}`,
+          subject: \`Relay: \${type}\`,
           text: JSON.stringify(payload),
         });
       }
@@ -44,3 +45,6 @@ export class MailerService {
     return null;
   }
 }
+`;
+fs.writeFileSync("apps/api/src/mailer/mailer.service.ts", content, "utf8");
+console.log("mailer.service.ts restored");

@@ -13,7 +13,10 @@
       {
         "name": "next"
       }
-    ]
+    ],
+    "target": "ES2017",
+    "allowJs": true,
+    "incremental": true
   },
   "include": [
     "next-env.d.ts",
