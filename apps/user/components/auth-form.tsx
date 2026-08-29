@@ -1,7 +1,17 @@
 "use client";
 import { useTransition } from "react";
-import { Button, Field, Input, Card, CardContent, CardHeader, CardTitle, CardDescription } from "@relay/ui";
-import { useToast } from "@relay/ui";
+import {
+  Button,
+  Field,
+  Input,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  useModal,
+  useToast,
+} from "@relay/ui";
 
 export function AuthForm({
   title,
@@ -14,14 +24,21 @@ export function AuthForm({
   title: string;
   description?: string;
   action: (fd: FormData) => Promise<{ ok?: boolean; error?: string } | void>;
-  fields: Array<{ name: string; label: string; type?: string; placeholder?: string; autoComplete?: string }>;
+  fields: Array<{
+    name: string;
+    label: string;
+    type?: string;
+    placeholder?: string;
+    autoComplete?: string;
+  }>;
   submitLabel: string;
   footer?: React.ReactNode;
 }) {
   const [pending, start] = useTransition();
   const { push } = useToast();
+  const { alert } = useModal();
   return (
-    <Card className="animate-in shadow-soft">
+    <Card className="animate-in shadow-soft w-full">
       <CardHeader>
         <CardTitle className="text-lg">{title}</CardTitle>
         {description ? <CardDescription>{description}</CardDescription> : null}
@@ -32,7 +49,14 @@ export function AuthForm({
           action={(fd) =>
             start(async () => {
               const res = await action(fd);
-              if (res && "ok" in res && res.ok === false) push(res.error ?? "Failed", "error");
+              if (res && "ok" in res && res.ok === false) {
+                await alert({
+                  title: "Something went wrong",
+                  description: res.error ?? "Please try again.",
+                  variant: "error",
+                });
+                push(res.error ?? "Failed", "error");
+              }
             })
           }
         >

@@ -3,18 +3,13 @@ import { ApiTags } from "@nestjs/swagger";
 import { User, UserRole } from "@prisma/client";
 import { Auth } from "../auth/auth.decorators";
 import { CurrentUser } from "../auth/current-user.decorator";
-import { Roles } from "../auth/roles.decorator";
-import { RolesGuard } from "../auth/roles.guard";
-import { UseGuards } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { decodeCursor, encodeCursor } from "../common/pagination";
 import { paisaToString } from "../common/money";
 
 @ApiTags("Activity")
 @Controller("activity")
-@Auth()
-@UseGuards(RolesGuard)
-@Roles(UserRole.USER)
+@Auth(UserRole.USER)
 export class ActivityController {
   constructor(private readonly prisma: PrismaService) {}
 

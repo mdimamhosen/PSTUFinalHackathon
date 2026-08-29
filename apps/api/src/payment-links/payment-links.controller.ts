@@ -3,18 +3,13 @@ import { ApiTags } from "@nestjs/swagger";
 import { User, UserRole } from "@prisma/client";
 import { Auth } from "../auth/auth.decorators";
 import { CurrentUser } from "../auth/current-user.decorator";
-import { Roles } from "../auth/roles.decorator";
-import { RolesGuard } from "../auth/roles.guard";
-import { UseGuards } from "@nestjs/common";
 import { decodeCursor } from "../common/pagination";
 import { CreatePaymentLinkDto } from "./payment-links.dto";
 import { PaymentLinksService } from "./payment-links.service";
 
 @ApiTags("PaymentLinks")
 @Controller("payment-links")
-@Auth()
-@UseGuards(RolesGuard)
-@Roles(UserRole.USER)
+@Auth(UserRole.USER)
 export class PaymentLinksController {
   constructor(private readonly links: PaymentLinksService) {}
 

@@ -9,8 +9,9 @@ import {
   CardTitle,
   Field,
   Input,
+  useModal,
+  useToast,
 } from "@relay/ui";
-import { useToast } from "@relay/ui";
 
 export function AuthForm({
   title,
@@ -27,8 +28,9 @@ export function AuthForm({
 }) {
   const [pending, start] = useTransition();
   const { push } = useToast();
+  const { alert } = useModal();
   return (
-    <Card className="animate-in shadow-sm">
+    <Card className="animate-in shadow-sm w-full">
       <CardHeader>
         <CardTitle className="text-lg">{title}</CardTitle>
         {description ? <CardDescription>{description}</CardDescription> : null}
@@ -39,7 +41,14 @@ export function AuthForm({
           action={(fd) =>
             start(async () => {
               const res = await action(fd);
-              if (res && "ok" in res && res.ok === false) push(res.error ?? "Failed", "error");
+              if (res && "ok" in res && res.ok === false) {
+                await alert({
+                  title: "Sign-in failed",
+                  description: res.error ?? "Please try again.",
+                  variant: "error",
+                });
+                push(res.error ?? "Failed", "error");
+              }
             })
           }
         >

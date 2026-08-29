@@ -3,17 +3,12 @@ import { ApiTags } from "@nestjs/swagger";
 import { User, UserRole } from "@prisma/client";
 import { Auth } from "../auth/auth.decorators";
 import { CurrentUser } from "../auth/current-user.decorator";
-import { Roles } from "../auth/roles.decorator";
-import { RolesGuard } from "../auth/roles.guard";
-import { UseGuards } from "@nestjs/common";
 import { AddTrustedContactDto } from "./trusted-contacts.dto";
 import { TrustedContactsService } from "./trusted-contacts.service";
 
 @ApiTags("TrustedContacts")
 @Controller("trusted-contacts")
-@Auth()
-@UseGuards(RolesGuard)
-@Roles(UserRole.USER)
+@Auth(UserRole.USER)
 export class TrustedContactsController {
   constructor(private readonly trusted: TrustedContactsService) {}
 

@@ -2,9 +2,6 @@ import { Controller, Get, Query } from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
 import { UserRole } from "@prisma/client";
 import { Auth } from "../auth/auth.decorators";
-import { Roles } from "../auth/roles.decorator";
-import { RolesGuard } from "../auth/roles.guard";
-import { UseGuards } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { ApiError, Codes } from "../common/errors";
 import { countIdentifiers, publicUser, resolveRecipient } from "../common/identifiers";
@@ -12,9 +9,7 @@ import { paisaToString } from "../common/money";
 
 @ApiTags("PaymentLinks")
 @Controller("pay")
-@Auth()
-@UseGuards(RolesGuard)
-@Roles(UserRole.USER)
+@Auth(UserRole.USER)
 export class PayResolveController {
   constructor(private readonly prisma: PrismaService) {}
 

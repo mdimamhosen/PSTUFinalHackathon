@@ -3,9 +3,6 @@ import { ApiHeader, ApiTags } from "@nestjs/swagger";
 import { User, UserRole, UserStatus } from "@prisma/client";
 import { Auth } from "../auth/auth.decorators";
 import { CurrentUser } from "../auth/current-user.decorator";
-import { Roles } from "../auth/roles.decorator";
-import { RolesGuard } from "../auth/roles.guard";
-import { UseGuards } from "@nestjs/common";
 import { IdempotencyKey } from "../common/idempotency.decorator";
 import { ApiError, Codes } from "../common/errors";
 import { decodeCursor, encodeCursor } from "../common/pagination";
@@ -14,9 +11,7 @@ import { TransfersService } from "./transfers.service";
 
 @ApiTags("Transfers")
 @Controller("transfers")
-@Auth()
-@UseGuards(RolesGuard)
-@Roles(UserRole.USER)
+@Auth(UserRole.USER)
 export class TransfersController {
   constructor(private readonly transfers: TransfersService) {}
 

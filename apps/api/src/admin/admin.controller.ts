@@ -2,17 +2,12 @@ import { Controller, Get, Param, Post, Query } from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
 import { AbuseDecision, UserRole } from "@prisma/client";
 import { Auth } from "../auth/auth.decorators";
-import { Roles } from "../auth/roles.decorator";
-import { RolesGuard } from "../auth/roles.guard";
-import { UseGuards } from "@nestjs/common";
 import { decodeCursor } from "../common/pagination";
 import { AdminService } from "./admin.service";
 
 @ApiTags("Admin")
 @Controller("admin")
-@Auth()
-@UseGuards(RolesGuard)
-@Roles(UserRole.ADMIN)
+@Auth(UserRole.ADMIN)
 export class AdminController {
   constructor(private readonly admin: AdminService) {}
 

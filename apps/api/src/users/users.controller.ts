@@ -2,17 +2,12 @@ import { Controller, Get, Query } from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
 import { UserRole } from "@prisma/client";
 import { Auth } from "../auth/auth.decorators";
-import { Roles } from "../auth/roles.decorator";
-import { RolesGuard } from "../auth/roles.guard";
-import { UseGuards } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { publicUser } from "../common/identifiers";
 
 @ApiTags("Users")
 @Controller("users")
-@Auth()
-@UseGuards(RolesGuard)
-@Roles(UserRole.USER)
+@Auth(UserRole.USER)
 export class UsersController {
   constructor(private readonly prisma: PrismaService) {}
 
