@@ -1,0 +1,11 @@
+---
+description: Thin controllers, one Transfer Engine, readable names
+alwaysApply: true
+---
+
+# Readable code
+
+Thin controllers. One Transfer Engine (`TransfersService.executeTransfer`) is the only code that mutates wallet balances or money ledger rows.
+Early returns. If two ways work, pick the one a judge can follow in 30 seconds.
+Prisma lives only in `apps/api`. Browser never calls Nest; Next.js Server Actions are the BFF.
+JWT in httpOnly cookies per app origin.

@@ -1,0 +1,9 @@
+---
+description: No comments in source unless the user asks
+alwaysApply: true
+---
+
+# No comments
+
+Do not add `//`, `/* */`, JSDoc, or TSDoc in source unless the user explicitly asks.
+Do not leave commented-out code. Names and structure must be readable without narration.

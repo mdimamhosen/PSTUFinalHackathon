@@ -1,0 +1,53 @@
+# Dependencies
+node_modules/
+
+# Monorepo / build outputs
+.turbo/
+dist/
+build/
+.next/
+out/
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# Environment (keep .env.example)
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# TypeScript
+*.tsbuildinfo
+
+# Prisma generated client cache (keep prisma/migrations)
+.prisma/
+node_modules/.prisma/
+
+# Local generated API output
+apps/api/generated/
+
+# Caches / temp
+.cache/
+*.tmp
+*.temp
+
+# Next.js / Vercel
+.vercel/
+
+# ESLint
+.eslintcache

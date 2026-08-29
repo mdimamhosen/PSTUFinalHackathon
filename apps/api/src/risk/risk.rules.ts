@@ -1,0 +1,7 @@
+export const DAILY_SEND_CAP_PAISA = 5_000_000n;
+export const VERIFY_DAILY_CAP_PAISA = 500_000n;
+export const VELOCITY_MAX = 5;
+export const VELOCITY_WINDOW_MS = 5 * 60 * 1000;
+export const NEW_RECIPIENT_LARGE_PAISA = 1_000_000n;
+export const PASSWORD_CHANGE_COOLDOWN_MS = 60 * 60 * 1000;
+export const FAILED_LOGIN_THRESHOLD = 5;

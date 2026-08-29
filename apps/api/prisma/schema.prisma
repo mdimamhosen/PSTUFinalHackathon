@@ -1,0 +1,391 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  USER
+  ADMIN
+  SYSTEM
+}
+
+enum UserStatus {
+  PENDING_EMAIL
+  PENDING_PHONE
+  ACTIVE
+  SUSPENDED
+}
+
+enum AbuseDecision {
+  ALLOW
+  VERIFY
+  BLOCK
+  ADMIN_REVIEW
+}
+
+enum WalletStatus {
+  ACTIVE
+  FROZEN
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+enum TransactionType {
+  TRANSFER
+  REQUEST_PAYMENT
+  SPLIT_PAYMENT
+  REVERSAL
+  REWARD
+  CASHBACK
+}
+
+enum LedgerType {
+  OPENING_BALANCE
+  TRANSFER
+  REVERSAL
+  CORRECTION
+  REWARD
+  CASHBACK
+}
+
+enum LedgerDirection {
+  DEBIT
+  CREDIT
+}
+
+enum MoneyRequestStatus {
+  PENDING
+  PAID
+  DECLINED
+  CANCELLED
+  EXPIRED
+}
+
+enum PaymentLinkStatus {
+  ACTIVE
+  REVOKED
+  EXPIRED
+}
+
+enum SplitBillStatus {
+  OPEN
+  SETTLED
+  CANCELLED
+}
+
+enum SplitShareKind {
+  HOST
+  DEBTOR
+}
+
+enum SplitShareStatus {
+  PENDING
+  PAID
+  DECLINED
+}
+
+enum AbuseEngine {
+  CLAUDE
+  RULES
+}
+
+enum AbuseSource {
+  REGISTER
+  OTP
+  EARLY_ACTIVITY
+}
+
+enum ScheduledStatus {
+  SCHEDULED
+  EXECUTED
+  CANCELLED
+  FAILED
+}
+
+model User {
+  id                 String         @id @default(uuid())
+  name               String
+  username           String
+  normalizedUsername String         @unique
+  email              String         @unique
+  phone              String         @unique
+  passwordHash       String
+  passwordChangedAt  DateTime?
+  role               UserRole       @default(USER)
+  status             UserStatus     @default(PENDING_EMAIL)
+  emailVerifiedAt    DateTime?
+  phoneVerifiedAt    DateTime?
+  accountNumber      String         @unique
+  registrationIp     String?
+  abuseDecision      AbuseDecision  @default(ALLOW)
+  abuseScore         Int            @default(0)
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+
+  wallet              Wallet?
+  sentTransactions    Transaction[]      @relation("FromUser")
+  receivedTransactions Transaction[]     @relation("ToUser")
+  requestsMade        MoneyRequest[]     @relation("Requester")
+  requestsToPay       MoneyRequest[]     @relation("Payer")
+  ownedLinks          PaymentLink[]
+  billsCreated        SplitBill[]
+  shares              SplitBillShare[]
+  trustedOwned        TrustedContact[]   @relation("Owner")
+  trustedAs           TrustedContact[]   @relation("Trusted")
+  rewardGrants        RewardGrant[]
+  auditLogs           AuditLog[]
+  outboxEvents        OutboxEvent[]
+  notifications       Notification[]
+  abuseAssessments    AbuseAssessment[]
+  scheduledFrom       ScheduledTransfer[]
+
+  @@map("users")
+}
+
+model Wallet {
+  id           String       @id @default(uuid())
+  userId       String       @unique
+  user         User         @relation(fields: [userId], references: [id])
+  currency     String       @default("BDT")
+  balancePaisa BigInt
+  status       WalletStatus @default(ACTIVE)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  ledger       LedgerEntry[]
+  fromTx       Transaction[] @relation("FromWallet")
+  toTx         Transaction[] @relation("ToWallet")
+
+  @@map("wallets")
+}
+
+model Transaction {
+  id              String            @id @default(uuid())
+  reference       String            @unique
+  fromUserId      String
+  toUserId        String
+  fromWalletId    String
+  toWalletId      String
+  fromUser        User              @relation("FromUser", fields: [fromUserId], references: [id])
+  toUser          User              @relation("ToUser", fields: [toUserId], references: [id])
+  fromWallet      Wallet            @relation("FromWallet", fields: [fromWalletId], references: [id])
+  toWallet        Wallet            @relation("ToWallet", fields: [toWalletId], references: [id])
+  amountPaisa     BigInt
+  currency        String            @default("BDT")
+  status          TransactionStatus @default(PENDING)
+  type            TransactionType
+  idempotencyKey  String
+  quoteSnapshot   Json?
+  requestId       String?           @unique
+  splitShareId    String?           @unique
+  paymentLinkId   String?
+  description     String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  ledger          LedgerEntry[]
+  moneyRequest    MoneyRequest?
+  splitShare      SplitBillShare?
+  paymentLink     PaymentLink?      @relation(fields: [paymentLinkId], references: [id])
+  scheduled       ScheduledTransfer[]
+
+  @@unique([fromUserId, idempotencyKey])
+  @@index([fromUserId, createdAt])
+  @@index([fromUserId, toUserId])
+  @@map("transactions")
+}
+
+model LedgerEntry {
+  id               String          @id @default(uuid())
+  transactionId    String?
+  transaction      Transaction?    @relation(fields: [transactionId], references: [id])
+  walletId         String
+  wallet           Wallet          @relation(fields: [walletId], references: [id])
+  type             LedgerType
+  direction        LedgerDirection
+  amountPaisa      BigInt
+  balanceAfterPaisa BigInt
+  createdAt        DateTime        @default(now())
+
+  @@index([walletId, createdAt, id])
+  @@map("ledger_entries")
+}
+
+model MoneyRequest {
+  id              String             @id @default(uuid())
+  requesterUserId String
+  payerUserId     String
+  requester       User               @relation("Requester", fields: [requesterUserId], references: [id])
+  payer           User               @relation("Payer", fields: [payerUserId], references: [id])
+  amountPaisa     BigInt
+  note            String?
+  status          MoneyRequestStatus @default(PENDING)
+  transactionId   String?            @unique
+  transaction     Transaction?       @relation(fields: [transactionId], references: [id])
+  expiresAt       DateTime?
+  createdAt       DateTime           @default(now())
+
+  @@index([payerUserId, status])
+  @@map("money_requests")
+}
+
+model PaymentLink {
+  id          String            @id @default(uuid())
+  publicToken String            @unique
+  ownerUserId String
+  owner       User              @relation(fields: [ownerUserId], references: [id])
+  amountPaisa BigInt?
+  note        String?
+  status      PaymentLinkStatus @default(ACTIVE)
+  expiresAt   DateTime?
+  createdAt   DateTime          @default(now())
+  payments    Transaction[]
+
+  @@index([ownerUserId, createdAt])
+  @@map("payment_links")
+}
+
+model SplitBill {
+  id              String          @id @default(uuid())
+  reference       String          @unique
+  creatorUserId   String
+  creator         User            @relation(fields: [creatorUserId], references: [id])
+  title           String
+  totalAmountPaisa BigInt
+  status          SplitBillStatus @default(OPEN)
+  createdAt       DateTime        @default(now())
+  shares          SplitBillShare[]
+
+  @@map("split_bills")
+}
+
+model SplitBillShare {
+  id              String           @id @default(uuid())
+  splitBillId     String
+  splitBill       SplitBill        @relation(fields: [splitBillId], references: [id])
+  userId          String
+  user            User             @relation(fields: [userId], references: [id])
+  shareAmountPaisa BigInt
+  kind            SplitShareKind
+  status          SplitShareStatus @default(PENDING)
+  transactionId   String?          @unique
+  transaction     Transaction?     @relation(fields: [transactionId], references: [id])
+
+  @@unique([splitBillId, userId])
+  @@index([userId, status])
+  @@map("split_bill_shares")
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  actorUserId String?
+  actor      User?    @relation(fields: [actorUserId], references: [id])
+  action     String
+  entityType String
+  entityId   String
+  metadata   Json?
+  createdAt  DateTime @default(now())
+
+  @@index([actorUserId, createdAt])
+  @@map("audit_logs")
+}
+
+model OutboxEvent {
+  id              String    @id @default(uuid())
+  type            String
+  aggregateId     String
+  recipientUserId String?
+  recipient       User?     @relation(fields: [recipientUserId], references: [id])
+  payload         Json
+  processedAt     DateTime?
+  attempts        Int       @default(0)
+  createdAt       DateTime  @default(now())
+
+  @@unique([type, aggregateId, recipientUserId])
+  @@index([processedAt, createdAt])
+  @@map("outbox_events")
+}
+
+model Notification {
+  id          String    @id @default(uuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  type        String
+  title       String
+  body        String
+  href        String?
+  aggregateId String
+  readAt      DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@unique([userId, type, aggregateId])
+  @@index([userId, createdAt])
+  @@map("notifications")
+}
+
+model ScheduledTransfer {
+  id             String          @id @default(uuid())
+  publicRef      String          @unique
+  fromUserId     String
+  fromUser       User            @relation(fields: [fromUserId], references: [id])
+  toUserId       String
+  amountPaisa    BigInt
+  executeAt      DateTime
+  status         ScheduledStatus @default(SCHEDULED)
+  idempotencyKey String
+  transactionId  String?
+  transaction    Transaction?    @relation(fields: [transactionId], references: [id])
+  createdAt      DateTime        @default(now())
+
+  @@unique([fromUserId, idempotencyKey])
+  @@index([status, executeAt])
+  @@map("scheduled_transfers")
+}
+
+model TrustedContact {
+  id            String   @id @default(uuid())
+  ownerUserId   String
+  trustedUserId String
+  owner         User     @relation("Owner", fields: [ownerUserId], references: [id])
+  trusted       User     @relation("Trusted", fields: [trustedUserId], references: [id])
+  createdAt     DateTime @default(now())
+
+  @@unique([ownerUserId, trustedUserId])
+  @@map("trusted_contacts")
+}
+
+model RewardGrant {
+  id            String   @id @default(uuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+  useCase       String
+  sourceId      String
+  transactionId String?
+  amountPaisa   BigInt
+  createdAt     DateTime @default(now())
+
+  @@unique([userId, useCase, sourceId])
+  @@map("reward_grants")
+}
+
+model AbuseAssessment {
+  id        String        @id @default(uuid())
+  userId    String
+  user      User          @relation(fields: [userId], references: [id])
+  source    AbuseSource
+  signals   Json
+  score     Int
+  decision  AbuseDecision
+  engine    AbuseEngine
+  reasons   Json
+  createdAt DateTime      @default(now())
+
+  @@index([userId, createdAt])
+  @@map("abuse_assessments")
+}

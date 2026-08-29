@@ -1,0 +1,29 @@
+{
+  "name": "relay",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "db:up": "docker compose up -d postgres redis",
+    "db:migrate": "npm run prisma:migrate -w @relay/api",
+    "db:seed": "npm run prisma:seed -w @relay/api"
+  },
+  "devDependencies": {
+    "turbo": "^2.5.8"
+  },
+  "packageManager": "npm@10.9.2",
+  "engines": {
+    "node": ">=20"
+  },
+  "allowScripts": {
+    "@prisma/client@6.19.3": true,
+    "prisma@6.19.3": true,
+    "@prisma/engines@6.19.3": true,
+    "bcrypt@5.1.1": true
+  }
+}
